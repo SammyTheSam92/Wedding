@@ -6,10 +6,18 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#ECEBE6">
 <title>Vivi & Sam — 08.10.2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Marcellus&family=Mr+Dafoe&family=Sacramento&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/HerrVonMuellerhoff-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/CormorantGaramond-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+/* ===== SELF-HOSTED FONTS (GDPR-friendly, no external requests) ===== */
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300;font-display:swap;src:url('fonts/CormorantGaramond-300-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/CormorantGaramond-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/CormorantGaramond-400-italic.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/CormorantGaramond-500-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:500;font-display:swap;src:url('fonts/CormorantGaramond-500-italic.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/CormorantGaramond-600-normal.woff2') format('woff2')}
+@font-face{font-family:'Marcellus';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Marcellus-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Herr Von Muellerhoff';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/HerrVonMuellerhoff-400-normal.woff2') format('woff2')}
 :root{
   --cream:#ECEBE6;
   --cream-deep:#E4E2DB;
@@ -30,7 +38,7 @@ body{
   font-size:19px;line-height:1.7;-webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
-.script{font-family:'Mr Dafoe',cursive;font-weight:400;line-height:1}
+.script{font-family:'Herr Von Muellerhoff',cursive;font-weight:400;line-height:1}
 .display{font-family:'Marcellus',serif;letter-spacing:.02em}
 .eyebrow{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.42em;font-size:12px;color:var(--muted)}
 
@@ -39,7 +47,7 @@ body{
 #gate.hidden{opacity:0;visibility:hidden}
 .gate-inner{max-width:440px;animation:gateIn 1.4s cubic-bezier(.2,.7,.2,1) both}
 @keyframes gateIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.gate-script{font-family:'Mr Dafoe',cursive;font-size:clamp(56px,12vw,104px);line-height:.9;color:var(--ink)}
+.gate-script{font-family:'Herr Von Muellerhoff',cursive;font-size:clamp(56px,12vw,104px);line-height:.9;color:var(--ink)}
 .gate-sub{margin:22px 0 36px;font-size:16px}
 .gate-sub .eyebrow{display:block;margin-bottom:14px}
 .gate-form{display:flex;flex-direction:column;align-items:center;gap:16px}
@@ -90,7 +98,7 @@ section{min-height:100vh;min-height:calc(var(--vh)*100);display:flex;align-items
 .hero-eyebrow{margin-bottom:30px}
 .hero-stage{position:relative;width:100%;max-width:880px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
 .hero-photo{width:min(72vw,640px);aspect-ratio:3/2;object-fit:cover;display:block;box-shadow:0 40px 90px -34px var(--shadow)}
-.hero-script{font-family:'Sacramento',cursive;font-size:clamp(72px,14vw,180px);line-height:.86;color:var(--ink);letter-spacing:.01em;position:relative;z-index:2;margin-bottom:-.34em;text-shadow:0 1px 0 rgba(236,235,230,.6)}
+.hero-script{font-family:'Herr Von Muellerhoff',cursive;font-size:clamp(72px,14vw,180px);line-height:.86;color:var(--ink);letter-spacing:.01em;position:relative;z-index:2;margin-bottom:-.34em;text-shadow:0 1px 0 rgba(236,235,230,.6)}
 .hero-meta{margin-top:38px}
 .hero-names{font-family:'Marcellus',serif;letter-spacing:.42em;font-size:15px;text-transform:uppercase;margin-bottom:16px}
 .hero-date{font-family:'Marcellus',serif;letter-spacing:.16em;font-size:clamp(19px,3vw,26px);margin-bottom:14px}
@@ -103,7 +111,7 @@ section{min-height:100vh;min-height:calc(var(--vh)*100);display:flex;align-items
 /* section heading */
 .sec-head{text-align:center;margin-bottom:62px}
 .sec-head .eyebrow{display:block;margin-bottom:18px}
-.sec-title{font-family:'Mr Dafoe',cursive;font-size:clamp(48px,8vw,82px);line-height:.95;color:var(--ink)}
+.sec-title{font-family:'Herr Von Muellerhoff',cursive;font-size:clamp(62px,10vw,112px);line-height:1.06;color:var(--ink)}
 .sec-rule{width:46px;height:1px;background:var(--accent);margin:22px auto 0}
 
 /* ============ DETAILS / TIMELINE ============ */
@@ -127,7 +135,7 @@ section{min-height:100vh;min-height:calc(var(--vh)*100);display:flex;align-items
 @media(max-width:900px){.cards{grid-template-columns:1fr;gap:20px;max-width:460px;margin:0 auto}}
 .card{background:var(--cream-card);padding:40px 30px;text-align:center;border:1px solid var(--line);transition:transform .6s cubic-bezier(.2,.7,.2,1),box-shadow .6s;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-8px);box-shadow:0 30px 64px -34px var(--shadow)}
-.card-ico{font-family:'Mr Dafoe',cursive;font-size:46px;color:var(--accent);line-height:1;margin-bottom:14px}
+.card-ico{font-family:'Herr Von Muellerhoff',cursive;font-size:46px;color:var(--accent);line-height:1;margin-bottom:14px}
 .card-title{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.2em;font-size:13px;margin-bottom:18px}
 .card-body{font-size:17.5px;color:var(--ink-soft);font-weight:300;flex:1}
 .hotel{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}
@@ -145,7 +153,7 @@ section{min-height:100vh;min-height:calc(var(--vh)*100);display:flex;align-items
 #gifts{background:var(--cream-deep)}
 .gift-box{max-width:580px;margin:0 auto;text-align:center}
 .gift-box p{font-size:21px;color:var(--ink-soft);font-weight:300;margin-bottom:20px}
-.gift-quote{font-family:'Mr Dafoe',cursive;font-size:clamp(40px,6vw,56px);color:var(--accent);line-height:1.2;margin:30px 0}
+.gift-quote{font-family:'Herr Von Muellerhoff',cursive;font-size:clamp(50px,7vw,74px);color:var(--accent);line-height:1.15;margin:30px 0}
 
 /* ============ RSVP ============ */
 #rsvp{background:var(--ink);color:var(--cream)}
@@ -193,7 +201,7 @@ section{min-height:100vh;min-height:calc(var(--vh)*100);display:flex;align-items
 .finale-content{position:relative;z-index:2;text-align:center;color:#fff;padding:0 28px 100px;max-width:760px}
 @media(max-width:900px){.finale-content{padding-bottom:130px}}
 .finale-eyebrow{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.42em;font-size:12px;color:rgba(255,255,255,.85);margin-bottom:22px}
-.finale-script{font-family:'Mr Dafoe',cursive;font-size:clamp(54px,9vw,104px);line-height:1.04;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.3)}
+.finale-script{font-family:'Herr Von Muellerhoff',cursive;font-size:clamp(54px,9vw,104px);line-height:1.04;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.3)}
 .finale-sub{margin-top:24px;font-size:clamp(19px,2.6vw,24px);font-weight:300;color:rgba(255,255,255,.92);letter-spacing:.01em}
 .finale-names{margin-top:36px;font-family:'Marcellus',serif;letter-spacing:.4em;font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.85)}
 .finale-date{margin-top:10px;font-family:'Marcellus',serif;letter-spacing:.3em;font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.6)}
@@ -210,19 +218,19 @@ html.lenis,html.lenis body{height:auto}
 ::selection{background:var(--accent);color:var(--cream)}
 
 /* softer, lighter reveals */
-.reveal{opacity:0;transform:translateY(24px);filter:blur(3px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out),filter .9s var(--ease-out);will-change:opacity,transform}
+.reveal{opacity:0;transform:translateY(50px);filter:blur(4px);transition:opacity 1s var(--ease-out),transform 1.05s var(--ease-out),filter 1s var(--ease-out);will-change:opacity,transform}
 .reveal.in{opacity:1;transform:none;filter:blur(0)}
-.reveal.scale{transform:translateY(24px) scale(.985)}
+.reveal.scale{transform:translateY(54px) scale(.93)}
 .reveal.scale.in{transform:none}
 .reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}.reveal.d4{transition-delay:.28s}.reveal.d5{transition-delay:.35s}.reveal.d6{transition-delay:.42s}
 
 /* hero entrance — plays when the code gate is unlocked ("the site comes alive") */
-body.entered #hero .hero-photo{animation:heroPhotoIn 1.9s var(--ease-out) .25s both}
-@keyframes heroPhotoIn{0%{opacity:0;transform:scale(1.14)}100%{opacity:1;transform:scale(1)}}
-body.entered #hero .hero-eyebrow{animation:heroUp 1s var(--ease-out) .15s both}
-body.entered #hero .hero-script{animation:heroUp 1.15s var(--ease-out) .4s both}
-body.entered #hero .hero-meta{animation:heroUp 1.15s var(--ease-out) .7s both}
-@keyframes heroUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+body.entered #hero .hero-photo{animation:heroPhotoIn 2.1s var(--ease-out) .25s both}
+@keyframes heroPhotoIn{0%{opacity:0;transform:scale(1.16);filter:blur(6px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+body.entered #hero .hero-eyebrow{animation:heroUp 1s var(--ease-out) .2s both}
+body.entered #hero .hero-script{animation:heroUp 1.3s var(--ease-out) .45s both}
+body.entered #hero .hero-meta{animation:heroUp 1.2s var(--ease-out) .8s both}
+@keyframes heroUp{from{opacity:0;transform:translateY(44px)}to{opacity:1;transform:none}}
 
 /* keyboard focus */
 a:focus-visible,button:focus-visible,input:focus-visible,.choice input:focus-visible+label{outline:2px solid var(--accent);outline-offset:4px}
@@ -237,7 +245,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,.choice input:focus-vis
 
 /* cards: refined lift */
 .card{transition:transform .55s var(--ease-out),box-shadow .55s var(--ease-out),border-color .55s var(--ease-out)}
-.card:hover{transform:translateY(-6px);box-shadow:0 28px 60px -32px var(--shadow);border-color:var(--accent)}
+.card:hover{transform:translateY(-10px);box-shadow:0 34px 70px -30px rgba(40,38,32,.28);border-color:var(--accent)}
 
 /* menu choice buttons: tactile */
 .choice label{transition:background .35s var(--ease-out),color .35s var(--ease-out),border-color .35s var(--ease-out),transform .2s var(--ease-out)}
