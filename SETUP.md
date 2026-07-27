@@ -5,22 +5,23 @@ Diese Anleitung beschreibt die 3 Schritte, die nur **du** im Browser erledigen k
 
 ---
 
-## 1. Repo öffentlich machen  →  Website geht live
+## 1. Website live schalten (GitHub Pages)
 
-GitHub Pages funktioniert bei kostenlosen Accounts nur mit einem **öffentlichen** Repo.
-Sobald das erledigt ist, wird die Seite bei jedem Push automatisch veröffentlicht.
+GitHub Pages funktioniert bei kostenlosen Accounts nur mit einem **öffentlichen** Repo
+(bereits erledigt). Veröffentlicht wird direkt aus dem Arbeits-Branch – bei jedem Push automatisch.
 
-1. Öffne: <https://github.com/SammyTheSam92/Wedding/settings>
-2. Ganz nach unten scrollen bis **„Danger Zone"**.
-3. Bei **„Change repository visibility"** auf **„Change visibility"** klicken → **„Make public"**.
-4. Zur Bestätigung den Repo-Namen `SammyTheSam92/Wedding` eintippen und bestätigen.
+Pages-Quelle einstellen (einmalig):
 
-> Hinweis: Der Quellcode (inkl. der beiden Fotos) ist danach öffentlich einsehbar.
+1. Öffne: <https://github.com/SammyTheSam92/Wedding/settings/pages>
+2. Unter **„Build and deployment" → „Source"**: **„Deploy from a branch"** wählen.
+3. **Branch:** `claude/wedding-website-rebuild-wup7kv` auswählen, Ordner **`/ (root)`**, dann **Save**.
+
+Nach 1–2 Minuten ist die Seite live unter:
+**`https://sammythesam92.github.io/Wedding/`**
+
+> Hinweis: Der Quellcode (inkl. der beiden Fotos) ist öffentlich einsehbar.
 > Für die Gäste-Seite selbst ist das ohnehin der Fall – der Passwort-Schutz hält nur
 > Neugierige & Suchmaschinen fern, ist aber kein echtes Sicherheitsschloss.
-
-**Danach:** Bescheid geben – Claude stößt den Deploy erneut an und nennt dir die Live-URL
-(voraussichtlich `https://sammythesam92.github.io/Wedding/`).
 
 ---
 
