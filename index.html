@@ -216,9 +216,13 @@ html.lenis,html.lenis body{height:auto}
 .reveal.scale.in{transform:none}
 .reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}.reveal.d4{transition-delay:.28s}.reveal.d5{transition-delay:.35s}.reveal.d6{transition-delay:.42s}
 
-/* hero photo: elegant entrance */
-#hero .hero-photo{animation:heroPhotoIn 1.7s var(--ease-out) both}
-@keyframes heroPhotoIn{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+/* hero entrance — plays when the code gate is unlocked ("the site comes alive") */
+body.entered #hero .hero-photo{animation:heroPhotoIn 1.9s var(--ease-out) .25s both}
+@keyframes heroPhotoIn{0%{opacity:0;transform:scale(1.14)}100%{opacity:1;transform:scale(1)}}
+body.entered #hero .hero-eyebrow{animation:heroUp 1s var(--ease-out) .15s both}
+body.entered #hero .hero-script{animation:heroUp 1.15s var(--ease-out) .4s both}
+body.entered #hero .hero-meta{animation:heroUp 1.15s var(--ease-out) .7s both}
+@keyframes heroUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 
 /* keyboard focus */
 a:focus-visible,button:focus-visible,input:focus-visible,.choice input:focus-visible+label{outline:2px solid var(--accent);outline-offset:4px}
@@ -521,7 +525,7 @@ setVH();window.addEventListener('resize',setVH);
       btn=document.getElementById('gateBtn'),err=document.getElementById('gateErr'),nav=document.getElementById('nav');
   function tryEnter(){
     if(input.value.trim()===ACCESS_CODE){
-      gate.classList.add('hidden');nav.classList.add('ready');document.body.style.overflow='';
+      gate.classList.add('hidden');nav.classList.add('ready');document.body.classList.add('entered');document.body.style.overflow='';
       setTimeout(function(){gate.style.display='none'},900);
     }else{
       err.classList.add('show');input.value='';input.focus();
@@ -610,7 +614,7 @@ setVH();window.addEventListener('resize',setVH);
   function initLenis(){
     if(started||reduce||coarse||!window.Lenis)return;
     started=true;
-    var lenis=new window.Lenis({duration:1.1,smoothWheel:true,wheelMultiplier:1,touchMultiplier:1.6});
+    var lenis=new window.Lenis({lerp:0.08,smoothWheel:true,wheelMultiplier:1,touchMultiplier:1.5});
     window.__lenis=lenis;
     requestAnimationFrame(function raf(t){lenis.raf(t);requestAnimationFrame(raf);});
   }
