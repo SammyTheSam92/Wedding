@@ -352,7 +352,6 @@ body.entered #progress{opacity:1}
 
         <div class="tl-phase reveal" data-i18n="det_phase2">Restaurant · Schwabing</div>
         <div class="tl-item reveal"><div class="tl-time" data-i18n="t4_time">16:00 UHR</div><div class="tl-name" data-i18n="t4_name">Aperitif</div><div class="tl-desc" data-i18n="t4_desc">Wir lassen uns im Restaurant nieder, es gibt was zu knabbern.</div></div>
-        <div class="tl-item reveal"><div class="tl-time" data-i18n="t5_time">16:15 UHR</div><div class="tl-name" data-i18n="t5_name">Unser Versprechen</div><div class="tl-desc" data-i18n="t5_desc">Kurz, persönlich, Drink in der Hand.</div></div>
         <div class="tl-item reveal"><div class="tl-time" data-i18n="t6_time">17:00 UHR</div><div class="tl-name" data-i18n="t6_name">Dinner</div><div class="tl-desc" data-i18n="t6_desc">Drei Gänge, ein paar Worte dazwischen.</div></div>
         <div class="tl-item reveal"><div class="tl-time" data-i18n="t7_time">20:00 UHR</div><div class="tl-name" data-i18n="t7_name">Live-Musik</div><div class="tl-desc" data-i18n="t7_desc">Lasst euch überraschen.</div></div>
         <div class="tl-item reveal"><div class="tl-time" data-i18n="t9_time">AB 22:00 UHR</div><div class="tl-name" data-i18n="t9_name">Party</div><div class="tl-desc" data-i18n="t9_desc">Tanzen, bis die Sonne aufgeht.</div></div>
@@ -582,7 +581,8 @@ setVH();window.addEventListener('resize',setVH);
   function tryEnter(){
     if(input.value.trim()===ACCESS_CODE){
       gate.classList.add('hidden');nav.classList.add('ready');document.body.classList.add('entered');document.body.style.overflow='';
-      setTimeout(function(){gate.style.display='none'},900);
+      input.blur();window.scrollTo(0,0);
+      setTimeout(function(){gate.style.display='none';window.scrollTo(0,0);},900);
     }else{
       err.classList.add('show');input.value='';input.focus();
       gate.querySelector('.gate-inner').animate(
