@@ -24,6 +24,7 @@ var FIELDS = [
   ['guest2_starter',   'Vorspeise (Begleitung)'],
   ['guest2_main',      'Hauptspeise (Begleitung)'],
   ['guest2_allergy',   'Allergien (Begleitung)'],
+  ['room',             'Zimmer'],
   ['message',          'Nachricht']
 ];
 
