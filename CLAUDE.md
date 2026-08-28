@@ -13,8 +13,9 @@ Supporting files:
 - `fonts/` — self-hosted `.woff2` (Cormorant Garamond, Marcellus, Herr Von Muellerhoff)
 - `assets/lenis.min.js` — smooth-scroll library, self-hosted
 - `apps-script/Code.gs` — Google Apps Script that receives RSVPs (see RSVP section)
+- `firebase/storage.rules` — Firebase Storage security rules for the guest photo/video uploads
 - `CNAME`, `.nojekyll` — GitHub Pages custom-domain + no-Jekyll markers
-- `SETUP.md` — the human-facing setup guide (make repo public, deploy Apps Script, DNS)
+- `SETUP.md` — the human-facing setup guide (make repo public, deploy Apps Script, DNS, Firebase)
 
 ## Critical gotchas
 
@@ -43,6 +44,19 @@ always shows success and cannot detect a server error.
 **The radio `value=` attributes are intentionally German** (`Vegetarisch`/`Fleisch`/`Fisch`,
 `Zusage`/`Absage`, etc.) so the spreadsheet stays consistent no matter the display language.
 Only the visible `<label>` text is translated. Keep it that way.
+
+## Guest photo/video uploads (`#fotos` section)
+
+Firebase Storage, guests upload directly from the browser. The whole feature is **gated**:
+the section (`<section id="fotos" hidden>`) and its nav link (`#nav-fotos`) stay hidden and
+the Firebase SDK is **never loaded** unless `uploadLive` is true — auto-unlocks on
+**2026-10-08**, or force it any time with `?fotos=1` for testing. Config lives in
+`FIREBASE_CONFIG` (top of the last `<script>`; the web config is **not** secret — security is
+in `firebase/storage.rules`). On unlock the code lazy-loads the Firebase **compat** SDK from
+gstatic, does **anonymous auth**, and `uploadBytesResumable`s each file to
+`gaeste-uploads/<name?>/…` (resumable → large videos survive). Security rules allow
+anonymous **write-only** (no read/list), image/* or video/*, < 2 GB. Owner needs the Blaze
+plan + an EU-region bucket; see SETUP.md §4.
 
 ## Internationalisation (DE / EN / ES)
 

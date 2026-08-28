@@ -1,0 +1,32 @@
+rules_version = '2';
+
+// Sicherheitsregeln für die Gäste-Uploads (Fotos & Videos).
+// In der Firebase Console unter  Storage → Regeln  einfügen und veröffentlichen.
+//
+// Prinzip:
+//  - Gäste melden sich anonym an (Anonymous Auth) und dürfen NUR schreiben.
+//  - Niemand kann die Dateien über die Website lesen oder auflisten
+//    (ihr seht sie in der Firebase Console / im verknüpften Cloud-Storage).
+//  - Nur Bilder und Videos, maximal 2 GB pro Datei.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Alles, was unter gaeste-uploads/ landet:
+    match /gaeste-uploads/{allPaths=**} {
+      allow read, list: if false;              // keine öffentliche Ansicht
+      allow create: if request.auth != null    // anonym angemeldet
+                    && request.resource.size < 2 * 1024 * 1024 * 1024   // < 2 GB
+                    && (
+                         request.resource.contentType.matches('image/.*')
+                      || request.resource.contentType.matches('video/.*')
+                    );
+      allow update, delete: if false;          // nichts überschreiben/löschen
+    }
+
+    // Alles andere ist gesperrt.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

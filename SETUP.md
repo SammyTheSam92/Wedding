@@ -60,3 +60,41 @@ Bei GoDaddy unter **My Products → Domain `vivi-sam.com` → DNS**:
 
 Danach trägt Claude die Domain im Repo (CNAME-Datei) und in GitHub Pages ein.
 DNS-Änderungen können bis zu 24 h dauern.
+
+---
+
+## 4. Foto- & Video-Upload für Gäste (Firebase Storage)
+
+Gäste können Fotos **und Videos** hochladen; alles landet in **deinem** Google-/Firebase-Konto
+(GDPR-konsistent, kein Drittanbieter). Die Upload-Section ist standardmäßig **ausgeblendet**
+und schaltet sich **automatisch am 08.10.2026** frei. Zum **Testen vorher** einfach `?fotos=1`
+an die URL hängen: `https://www.vivi-sam.com/?fotos=1`.
+
+> **Wichtig – Kosten:** Firebase Storage braucht heute den **Blaze-Tarif** (Pay-as-you-go,
+> Kreditkarte hinterlegen). Es gibt ein großzügiges Gratis-Kontingent; für eine Hochzeit
+> fallen meist **0 €** oder wenige Cent an. **Trotzdem:** unter *Budgets & Alerts* eine
+> **Budget-Warnung (z. B. 5 €)** setzen, dann gibt es keine Überraschung.
+
+**Einrichtung (einmalig):**
+
+1. **Projekt anlegen:** <https://console.firebase.google.com> → *Projekt hinzufügen*
+   (du kannst dasselbe Google-Konto wie für die Tabelle nutzen).
+2. **Blaze-Tarif** aktivieren (unten links *Tarif ändern → Blaze*) und eine
+   **Budget-Warnung** setzen.
+3. **Storage** öffnen → *Los geht's*. Als **Speicherort eine EU-Region** wählen
+   (z. B. `europe-west3`, Frankfurt). ⚠️ Der Ort lässt sich später **nicht** ändern.
+4. **Regeln einfügen:** Storage → Reiter **Regeln** → kompletten Inhalt aus
+   [`firebase/storage.rules`](firebase/storage.rules) einfügen → **Veröffentlichen**.
+5. **Anonyme Anmeldung erlauben:** *Authentication → Sign-in method →
+   Anonym → aktivieren*. (Damit dürfen Gäste ohne Login hochladen.)
+6. **Web-App registrieren:** Projektübersicht → Symbol **`</>`** (Web) → App benennen →
+   *Registrieren*. Google zeigt ein `firebaseConfig`-Objekt mit
+   `apiKey`, `authDomain`, `projectId`, `storageBucket`, `appId`.
+   **Diese Werte kopieren und Claude schicken** – Claude trägt sie in die Website ein.
+   (Diese Werte sind **nicht geheim**, sie gehören in den Client-Code; die Sicherheit
+   kommt aus den Regeln in Schritt 4.)
+7. **Domains freigeben:** *Authentication → Settings → Authorized domains* →
+   `www.vivi-sam.com` und `sammythesam92.github.io` hinzufügen.
+
+Danach: `?fotos=1` anhängen und einen Test-Upload machen. Die Dateien erscheinen in
+**Storage** unter `gaeste-uploads/` (bei angegebenem Namen in einem Unterordner pro Person).
