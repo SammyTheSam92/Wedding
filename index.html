@@ -170,7 +170,12 @@ section{min-height:100vh;min-height:calc(var(--vh)*100);display:flex;align-items
 .dress-close{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--ink-soft)}
 
 /* ============ FOTOS / UPLOAD ============ */
-#fotos{background:var(--cream)}
+/* Hidden for everyone by default; JS adds .live only when unlocked
+   (?fotos=1 test link, or from 2026-10-08). #id beats section{display:flex}. */
+#fotos{background:var(--cream);display:none}
+#fotos.live{display:flex}
+#nav-fotos{display:none}
+#nav-fotos.live{display:flex}
 .fotos-box{max-width:560px;margin:0 auto;text-align:center}
 .fotos-intro{font-size:20px;color:var(--ink-soft);font-weight:300;margin-bottom:30px}
 .up-name{max-width:340px;margin:0 auto 22px;text-align:left}
@@ -360,7 +365,7 @@ body.entered #progress{opacity:1}
 <nav id="nav">
   <button class="nav-link" data-target="hero"><span class="nav-dot"></span><span class="nav-line-track"></span><span class="nav-label" data-i18n="nav_start">Start</span></button>
   <button class="nav-link" data-target="details"><span class="nav-dot"></span><span class="nav-line-track"></span><span class="nav-label" data-i18n="nav_ablauf">Ablauf</span></button>
-  <button class="nav-link" id="nav-fotos" data-target="fotos" hidden><span class="nav-dot"></span><span class="nav-line-track"></span><span class="nav-label" data-i18n="nav_fotos">Fotos</span></button>
+  <button class="nav-link" id="nav-fotos" data-target="fotos"><span class="nav-dot"></span><span class="nav-line-track"></span><span class="nav-label" data-i18n="nav_fotos">Fotos</span></button>
   <button class="nav-link" data-target="venue"><span class="nav-dot"></span><span class="nav-line-track"></span><span class="nav-label" data-i18n="nav_anreise">Anreise</span></button>
   <button class="nav-link" data-target="gifts"><span class="nav-dot"></span><span class="nav-line-track"></span><span class="nav-label" data-i18n="nav_geschenke">Geschenke</span></button>
   <button class="nav-link" data-target="dresscode"><span class="nav-dot"></span><span class="nav-line-track"></span><span class="nav-label" data-i18n="nav_dresscode">Dresscode</span></button>
@@ -413,7 +418,7 @@ body.entered #progress{opacity:1}
   </section>
 
   <!-- FOTOS / GUEST UPLOADS -->
-  <section id="fotos" hidden>
+  <section id="fotos">
     <div class="wrap narrow">
       <div class="sec-head reveal">
         <span class="eyebrow" data-i18n="fotos_eyebrow">F&uuml;r die Erinnerung</span>
@@ -859,7 +864,7 @@ var FIREBASE_CONFIG = {
   var forced=/[?&]fotos=1(?:&|$)/.test(location.search);
   var live=forced||Date.now()>=UNLOCK;
   if(!live){ if(navLink)navLink.parentNode.removeChild(navLink); return; }
-  sec.hidden=false; if(navLink)navLink.hidden=false;
+  sec.classList.add('live'); if(navLink)navLink.classList.add('live');
 
   var configured=String(FIREBASE_CONFIG.apiKey).indexOf('PASTE_')!==0;
   var V='10.14.1', BASE='https://www.gstatic.com/firebasejs/'+V+'/';
