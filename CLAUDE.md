@@ -48,9 +48,11 @@ Only the visible `<label>` text is translated. Keep it that way.
 ## Guest photo/video uploads (`#fotos` section)
 
 Firebase Storage, guests upload directly from the browser. The whole feature is **gated**:
-the section (`<section id="fotos" hidden>`) and its nav link (`#nav-fotos`) stay hidden and
-the Firebase SDK is **never loaded** unless `uploadLive` is true — auto-unlocks on
-**2026-10-08**, or force it any time with `?fotos=1` for testing. Config lives in
+the section (`#fotos`) and its nav link (`#nav-fotos`) are hidden by CSS
+(`#fotos{display:none}`) and only revealed by JS adding a `.live` class — the plain HTML
+`hidden` attribute is **not** enough here because the author rule `section{display:flex}`
+overrides the UA `[hidden]` rule. The Firebase SDK is **never loaded** unless `live` is true
+— auto-unlocks on **2026-10-08**, or force it any time with `?fotos=1` for testing. Config lives in
 `FIREBASE_CONFIG` (top of the last `<script>`; the web config is **not** secret — security is
 in `firebase/storage.rules`). On unlock the code lazy-loads the Firebase **compat** SDK from
 gstatic, does **anonymous auth**, and `uploadBytesResumable`s each file to
