@@ -895,10 +895,24 @@ var FIREBASE_CONFIG = {
   var live=forced||Date.now()>=UNLOCK;
   if(!live){ if(navLink)navLink.parentNode.removeChild(navLink); var ng0=document.getElementById('nav-galerie'); if(ng0)ng0.parentNode.removeChild(ng0); return; }
   sec.classList.add('live'); if(navLink)navLink.classList.add('live');
-  var galSec=document.getElementById('galerie'); if(galSec)galSec.classList.add('live');
-  var galNav=document.getElementById('nav-galerie'); if(galNav)galNav.classList.add('live');
   var rsvpSec=document.getElementById('rsvp'); if(rsvpSec)rsvpSec.style.display='none';
   var rsvpNav=document.querySelector('.nav-link[data-target="rsvp"]'); if(rsvpNav)rsvpNav.style.display='none';
+  // Galerie-Bereich erscheint nur, wenn das Brautpaar den Schalter geöffnet hat
+  // (Firestore-Flagge config/gallery.public == true), sonst bleibt er verborgen.
+  (function(){
+    var galSec=document.getElementById('galerie'), galNav=document.getElementById('nav-galerie');
+    if(!galSec&&!galNav)return;
+    var FS='https://firestore.googleapis.com/v1/projects/'+FIREBASE_CONFIG.projectId+'/databases/(default)/documents/config/gallery?key='+FIREBASE_CONFIG.apiKey;
+    function check(){
+      fetch(FS,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){
+        var open=!!(d&&d.fields&&d.fields.public&&d.fields.public.booleanValue===true);
+        if(galSec)galSec.classList.toggle('live',open);
+        if(galNav)galNav.classList.toggle('live',open);
+      }).catch(function(){});
+    }
+    check(); setInterval(check,30000);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});
+  })();
 
   var configured=String(FIREBASE_CONFIG.apiKey).indexOf('PASTE_')!==0;
   var V='10.14.1', BASE='https://www.gstatic.com/firebasejs/'+V+'/';

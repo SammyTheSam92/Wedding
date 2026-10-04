@@ -73,8 +73,11 @@ Firebase rules, not the page:
 - The toggle writes `config/gallery.public` (Firestore). When `true`, `firebase/storage.rules`
   grants read/list to everyone, so guests can view+download; when `false`, only admins can.
 - The page recursively `listAll()`s `gaeste-uploads/`, polls every 20 s, renders newest-first,
-  with a lightbox. Guests reach it only when public (share the URL, or via a main-site link if
-  one is later added). Keep the two rule files in `firebase/` in sync with the console.
+  with a lightbox. Keep the two rule files in `firebase/` in sync with the console.
+- **Main-site "Galerie" CTA:** in celebration mode (08.10 or `?fotos=1`) `index.html` shows a
+  `#galerie` section + `#nav-galerie` link *only when the toggle is open* — it reads
+  `config/gallery.public` via a lightweight **Firestore REST GET** (no SDK), polling every 30 s
+  and on `visibilitychange`, toggling `.live`. Celebration mode also hides `#rsvp` + its nav link.
 
 ## Internationalisation (DE / EN / ES)
 
