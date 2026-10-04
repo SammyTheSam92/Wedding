@@ -66,6 +66,23 @@ header{text-align:center;margin-bottom:28px}
 .lb-nav[disabled]{opacity:.22;cursor:default}
 @media(max-width:600px){.lb-nav{width:42px;height:42px;font-size:24px;background:rgba(255,255,255,.1)}}
 footer{text-align:center;margin-top:50px;font-size:13px;color:var(--muted);font-family:'Marcellus',serif;letter-spacing:.2em;text-transform:uppercase}
+.grid-tools{display:flex;justify-content:flex-end;margin:0 0 14px}
+.gtool{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--accent);background:none;border:1px solid var(--line);padding:9px 18px;border-radius:100px;cursor:pointer;transition:all .3s}
+.gtool.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tile .chk{position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--line);display:none;align-items:center;justify-content:center;font-size:14px;color:#fff;z-index:2}
+.selecting .tile .chk{display:flex}
+.tile.sel .chk{background:var(--accent);border-color:var(--accent)}
+.tile.sel .chk::after{content:"\2713"}
+.tile.sel{outline:3px solid var(--accent);outline-offset:-3px}
+.selecting .tile .dl{display:none}
+.selbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:none;align-items:center;gap:14px;background:var(--ink);color:var(--cream);padding:12px 20px;border-radius:100px;box-shadow:0 14px 44px rgba(0,0,0,.32);z-index:60;max-width:92vw}
+.selbar.show{display:flex}
+.selbar .scount{font-family:'Marcellus',serif;letter-spacing:.08em;font-size:13px;white-space:nowrap}
+.selbar .smsg{font-size:12.5px;color:#cbc7bd;font-style:italic}
+.selbar button{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px;cursor:pointer;border:none;background:none;white-space:nowrap}
+.selbar .sel-dl{background:var(--cream);color:var(--ink);padding:9px 18px;border-radius:100px}
+.selbar .sel-dl:disabled{opacity:.5;cursor:wait}
+.selbar .sel-cancel{color:#cbc7bd}
 </style>
 </head>
 <body>
@@ -97,8 +114,18 @@ footer{text-align:center;margin-top:50px;font-size:13px;color:var(--muted);font-
   <!-- login hint for the couple when gallery is public -->
   <div style="text-align:center"><span class="loginlink hidden" id="loginLink">Als Brautpaar einloggen</span></div>
 
+  <div class="grid-tools hidden" id="gridTools">
+    <button class="gtool" id="selectBtn">Auswählen</button>
+  </div>
   <div class="msg hidden" id="msg"></div>
   <div class="grid" id="grid"></div>
+</div>
+
+<div class="selbar" id="selbar">
+  <span class="scount" id="selCount">0 ausgewählt</span>
+  <span class="smsg" id="selMsg"></span>
+  <button class="sel-dl" id="selDownload">Sichern</button>
+  <button class="sel-cancel" id="selCancel">Abbrechen</button>
 </div>
 
 <div class="lb" id="lb">
@@ -135,10 +162,11 @@ var FIREBASE_CONFIG = {
       loginLink=$('loginLink'), msg=$('msg'), grid=$('grid'),
       emailEl=$('email'), pwEl=$('pw'), loginBtn=$('loginBtn'), loginErr=$('loginErr'),
       toggleBtn=$('toggleBtn'), countEl=$('count'), refreshBtn=$('refreshBtn'), logoutBtn=$('logoutBtn'),
-      lb=$('lb'), lbClose=$('lbClose'), lbStage=$('lbStage'), lbPrev=$('lbPrev'), lbNext=$('lbNext'), lbDl=$('lbDl');
+      lb=$('lb'), lbClose=$('lbClose'), lbStage=$('lbStage'), lbPrev=$('lbPrev'), lbNext=$('lbNext'), lbDl=$('lbDl'),
+      gridTools=$('gridTools'), selectBtn=$('selectBtn'), selbar=$('selbar'), selCount=$('selCount'), selMsg=$('selMsg'), selDownload=$('selDownload'), selCancel=$('selCancel');
 
   var user=null, isPublic=false, started=false, timer=null, loginForced=false;
-  var known={}, itemsOrder=[], currentItem=null;
+  var known={}, itemsOrder=[], currentItem=null, selecting=false, selected={};
 
   function show(el){el.classList.remove('hidden');}
   function hide(el){el.classList.add('hidden');}
@@ -173,7 +201,7 @@ var FIREBASE_CONFIG = {
   }
 
   // ---- gallery ----
-  function clearGrid(){ grid.innerHTML=''; known={}; itemsOrder=[]; countEl.textContent='0 Dateien'; }
+  function clearGrid(){ grid.innerHTML=''; known={}; itemsOrder=[]; countEl.textContent='0 Dateien'; if(gridTools)gridTools.classList.add('hidden'); if(selecting)exitSelect(); }
   function startGallery(){ if(started)return; started=true; scan(); timer=setInterval(scan,20000); }
   function stopGallery(){ started=false; if(timer){clearInterval(timer);timer=null;} }
 
@@ -197,6 +225,7 @@ var FIREBASE_CONFIG = {
         data.forEach(function(x){ known[x.it.fullPath]=1; itemsOrder.unshift(x); grid.insertBefore(makeTile(x), grid.firstChild); });
         hideMsg();
         countEl.textContent=Object.keys(known).length+' Dateien';
+        gridTools.classList.toggle('hidden', Object.keys(known).length===0);
       });
     }).catch(function(e){
       if(user||isPublic) showMsg('Konnte Galerie nicht laden ('+((e&&e.code)||'?')+').');
@@ -214,12 +243,13 @@ var FIREBASE_CONFIG = {
       media=document.createElement('img'); media.loading='lazy'; media.src=x.url; media.alt=von||'Foto';
     }
     tile.appendChild(media);
+    var chk=document.createElement('div'); chk.className='chk'; tile.appendChild(chk);
     if(von){ var l=document.createElement('div'); l.className='von'; l.textContent=von; tile.appendChild(l); }
     var dl=document.createElement('a'); dl.className='dl'; dl.href=x.url; dl.target='_blank'; dl.rel='noopener';
     dl.textContent='↓'; dl.title='Herunterladen';
-    dl.onclick=function(e){ e.stopPropagation(); e.preventDefault(); download(x); };
+    dl.onclick=function(e){ e.stopPropagation(); e.preventDefault(); saveFiles([x]); };
     tile.appendChild(dl);
-    tile.onclick=function(){ openLightbox(x); };
+    tile.onclick=function(){ if(selecting) toggleSel(x,tile); else openLightbox(x); };
     return tile;
   }
 
@@ -244,18 +274,39 @@ var FIREBASE_CONFIG = {
     var ni=idx+dir; if(ni<0||ni>=itemsOrder.length)return;
     currentItem=itemsOrder[ni]; renderLB();
   }
-  function download(x){
-    var url=x.url, name=(x.it&&x.it.name)||'datei';
-    fetch(url).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(blob){
-      var ou=URL.createObjectURL(blob), a=document.createElement('a');
-      a.href=ou; a.download=name; document.body.appendChild(a); a.click();
-      setTimeout(function(){ URL.revokeObjectURL(ou); a.remove(); },1500);
-    }).catch(function(){ window.open(url,'_blank','noopener'); });
+  function triggerDownload(file){
+    var u=URL.createObjectURL(file), a=document.createElement('a');
+    a.href=u; a.download=file.name; document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); },1500);
+  }
+  function saveFiles(items,opts){
+    opts=opts||{}; if(!items.length)return;
+    if(opts.onstart)opts.onstart();
+    Promise.all(items.map(function(x){
+      return fetch(x.url).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(blob){
+        return new File([blob],(x.it&&x.it.name)||'datei',{type:blob.type||x.meta.contentType||''});
+      });
+    })).then(function(files){
+      // iPhone/Android: nativer Teilen-Dialog -> "In Fotos sichern"
+      if(navigator.canShare&&navigator.canShare({files:files})){
+        return navigator.share({files:files}).then(function(){ if(opts.ondone)opts.ondone(); })
+          .catch(function(err){
+            if(err&&err.name==='AbortError'){ if(opts.ondone)opts.ondone(); return; }
+            files.forEach(function(f,i){ setTimeout(function(){triggerDownload(f);},i*300); }); if(opts.ondone)opts.ondone();
+          });
+      }
+      // Desktop: als einzelne Dateien speichern
+      files.forEach(function(f,i){ setTimeout(function(){triggerDownload(f);},i*300); });
+      if(opts.ondone)opts.ondone();
+    }).catch(function(){
+      if(opts.onerror)opts.onerror();
+      else if(items.length===1) window.open(items[0].url,'_blank','noopener');
+    });
   }
   lbClose.onclick=closeLightbox;
   lbPrev.onclick=function(e){ e.stopPropagation(); step(-1); };
   lbNext.onclick=function(e){ e.stopPropagation(); step(1); };
-  lbDl.onclick=function(e){ e.stopPropagation(); if(currentItem)download(currentItem); };
+  lbDl.onclick=function(e){ e.stopPropagation(); if(currentItem)saveFiles([currentItem]); };
   lb.onclick=function(e){ if(e.target===lb||e.target===lbStage) closeLightbox(); };
   document.addEventListener('keydown',function(e){
     if(!lb.classList.contains('show'))return;
@@ -273,6 +324,33 @@ var FIREBASE_CONFIG = {
       x0=null;y0=null;
     },{passive:true});
   })();
+
+  // ---- Mehrfach-Auswahl + Sichern ----
+  function updateSel(){ var n=Object.keys(selected).length; selCount.textContent=n+' ausgewählt'; selDownload.disabled=n===0; }
+  function toggleSel(x,tile){
+    var k=x.it.fullPath;
+    if(selected[k]){ delete selected[k]; tile.classList.remove('sel'); }
+    else { selected[k]=x; tile.classList.add('sel'); }
+    updateSel();
+  }
+  function enterSelect(){ selecting=true; document.body.classList.add('selecting'); selectBtn.classList.add('active'); selectBtn.textContent='Fertig'; selbar.classList.add('show'); selMsg.textContent=''; updateSel(); }
+  function exitSelect(){
+    selecting=false; selected={}; document.body.classList.remove('selecting');
+    selectBtn.classList.remove('active'); selectBtn.textContent='Auswählen'; selbar.classList.remove('show'); selMsg.textContent='';
+    var ts=document.querySelectorAll('.tile.sel'); for(var i=0;i<ts.length;i++)ts[i].classList.remove('sel');
+  }
+  selectBtn.onclick=function(){ if(selecting)exitSelect(); else enterSelect(); };
+  selCancel.onclick=exitSelect;
+  selDownload.onclick=function(){
+    var items=[],k; for(k in selected)items.push(selected[k]);
+    if(!items.length)return;
+    selDownload.disabled=true;
+    saveFiles(items,{
+      onstart:function(){ selMsg.textContent='Wird vorbereitet …'; },
+      ondone:function(){ exitSelect(); },
+      onerror:function(){ selDownload.disabled=false; selMsg.textContent='Fehlgeschlagen (CORS?).'; }
+    });
+  };
 
   // ---- controls ----
   loginBtn.onclick=function(){

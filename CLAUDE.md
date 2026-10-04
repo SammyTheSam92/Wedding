@@ -74,6 +74,12 @@ Firebase rules, not the page:
   grants read/list to everyone, so guests can view+download; when `false`, only admins can.
 - The page recursively `listAll()`s `gaeste-uploads/`, polls every 20 s, renders newest-first,
   with a lightbox. Keep the two rule files in `firebase/` in sync with the console.
+- **Download / multi-select:** `saveFiles(items)` fetches each file as a `File` then prefers
+  `navigator.share({files})` (iPhone → "In Fotos sichern"), falling back to individual
+  blob downloads on desktop. An "Auswählen" mode (`#selectBtn` → `.selecting`, checkmarks,
+  `#selbar`) lets a viewer pick several tiles and save them together. All of this needs the
+  Storage bucket to have **CORS** configured (GET from the site origins) so the browser may
+  read the bytes — one-time `gcloud storage buckets update … --cors-file` / `gsutil cors set`.
 - **Main-site "Galerie" CTA:** in celebration mode (08.10 or `?fotos=1`) `index.html` shows a
   `#galerie` section + `#nav-galerie` link *only when the toggle is open* — it reads
   `config/gallery.public` via a lightweight **Firestore REST GET** (no SDK), polling every 30 s
