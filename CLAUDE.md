@@ -13,7 +13,9 @@ Supporting files:
 - `fonts/` — self-hosted `.woff2` (Cormorant Garamond, Marcellus, Herr Von Muellerhoff)
 - `assets/lenis.min.js` — smooth-scroll library, self-hosted
 - `apps-script/Code.gs` — Google Apps Script that receives RSVPs (see RSVP section)
-- `firebase/storage.rules` — Firebase Storage security rules for the guest photo/video uploads
+- `firebase/storage.rules` — Firebase Storage security rules (guest write-only uploads + gallery read)
+- `firebase/firestore.rules` — Firestore rules for the single `config/gallery` toggle doc
+- `galerie.html` — private/admin photo+video gallery (see its section below)
 - `CNAME`, `.nojekyll` — GitHub Pages custom-domain + no-Jekyll markers
 - `SETUP.md` — the human-facing setup guide (make repo public, deploy Apps Script, DNS, Firebase)
 
@@ -59,6 +61,20 @@ gstatic, does **anonymous auth**, and `uploadBytesResumable`s each file to
 `gaeste-uploads/<name?>/…` (resumable → large videos survive). Security rules allow
 anonymous **write-only** (no read/list), image/* or video/*, < 2 GB. Owner needs the Blaze
 plan + an EU-region bucket; see SETUP.md §4.
+
+## Private gallery (`galerie.html`)
+
+A standalone page (not part of `index.html`) where the couple view all guest uploads live
+and can open the gallery to guests. Loads Firebase compat SDKs (app/auth/firestore/storage)
+from gstatic; same `FIREBASE_CONFIG` as `index.html`. Access is governed entirely by the
+Firebase rules, not the page:
+- **Admins** = Email/Password Auth users (`sign_in_provider == 'password'`) — only the couple.
+  They log in on the page, always see everything, and get an AN/AUS toggle.
+- The toggle writes `config/gallery.public` (Firestore). When `true`, `firebase/storage.rules`
+  grants read/list to everyone, so guests can view+download; when `false`, only admins can.
+- The page recursively `listAll()`s `gaeste-uploads/`, polls every 20 s, renders newest-first,
+  with a lightbox. Guests reach it only when public (share the URL, or via a main-site link if
+  one is later added). Keep the two rule files in `firebase/` in sync with the console.
 
 ## Internationalisation (DE / EN / ES)
 

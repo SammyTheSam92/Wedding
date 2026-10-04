@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ECEBE6">
+<title>Galerie — Vivi &amp; Sam</title>
+<style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/CormorantGaramond-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Marcellus';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Marcellus-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Herr Von Muellerhoff';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/HerrVonMuellerhoff-400-normal.woff2') format('woff2')}
+:root{--cream:#ECEBE6;--cream-card:#F4F3EF;--ink:#0E0E10;--ink-soft:#39383b;--muted:#8a8780;--line:#cfccc3;--accent:#9a8c74;--on:#7f9068;--bad:#a4543f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased;padding:32px 18px 80px}
+.wrap{max-width:1100px;margin:0 auto}
+header{text-align:center;margin-bottom:28px}
+.eyebrow{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.4em;font-size:11px;color:var(--muted)}
+.title{font-family:'Herr Von Muellerhoff',cursive;font-size:clamp(54px,10vw,92px);line-height:1;color:var(--ink);margin-top:6px}
+.rule{width:44px;height:1px;background:var(--accent);margin:16px auto 0}
+.hidden{display:none!important}
+/* login */
+.login{max-width:360px;margin:30px auto;background:var(--cream-card);border:1px solid var(--line);padding:28px 24px;text-align:center}
+.login h2{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.18em;font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+.login input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--ink);font-family:'Cormorant Garamond',serif;font-size:18px;padding:10px 2px;outline:none;margin-bottom:16px;transition:border-color .3s}
+.login input:focus{border-color:var(--accent)}
+.btn{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.2em;font-size:12px;padding:13px 30px;cursor:pointer;background:var(--ink);color:var(--cream);border:1px solid var(--ink);transition:all .35s}
+.btn:hover{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:wait}
+.err{color:var(--bad);font-style:italic;font-size:15px;min-height:20px;margin-top:4px}
+.loginlink{display:inline-block;margin:10px auto 0;font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.16em;font-size:10.5px;color:var(--accent);cursor:pointer;border-bottom:1px solid transparent}
+.loginlink:hover{border-color:var(--accent)}
+/* admin bar */
+.adminbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;background:var(--cream-card);border:1px solid var(--line);padding:14px 18px;margin:0 auto 26px;max-width:720px}
+.toggle{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.16em;font-size:12px;padding:11px 22px;cursor:pointer;border-radius:100px;border:1px solid var(--line);transition:all .3s}
+.toggle.off{background:transparent;color:var(--muted)}
+.toggle.on{background:var(--on);color:#fff;border-color:var(--on)}
+.toggle:disabled{opacity:.5;cursor:wait}
+.meta{font-size:14px;color:var(--muted);font-family:'Marcellus',serif;letter-spacing:.06em}
+.linkbtn{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.14em;font-size:10.5px;color:var(--accent);cursor:pointer;background:none;border:none;border-bottom:1px solid transparent}
+.linkbtn:hover{border-color:var(--accent)}
+.statusline{text-align:center;font-family:'Marcellus',serif;letter-spacing:.1em;font-size:12px;text-transform:uppercase;color:var(--on);margin:-8px auto 22px}
+.statusline.off{color:var(--muted)}
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{position:relative;aspect-ratio:1;overflow:hidden;background:var(--cream-card);border:1px solid var(--line);cursor:pointer}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block}
+.tile.is-video::after{content:"\25B6";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:26px;text-shadow:0 2px 10px rgba(0,0,0,.5);pointer-events:none}
+.tile .von{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);color:#fff;font-size:12px;padding:16px 8px 6px;font-family:'Marcellus',serif;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .dl{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.85);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;opacity:0;transition:opacity .25s}
+.tile:hover .dl{opacity:1}
+.msg{text-align:center;color:var(--muted);font-style:italic;font-size:17px;margin:40px auto}
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(18,16,12,.92);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.lb.show{display:flex}
+.lb-media{max-width:96vw;max-height:92vh;object-fit:contain;box-shadow:0 20px 70px rgba(0,0,0,.5)}
+.lb-close{position:fixed;top:16px;right:20px;color:#fff;font-size:30px;cursor:pointer;opacity:.85;line-height:1}
+footer{text-align:center;margin-top:50px;font-size:13px;color:var(--muted);font-family:'Marcellus',serif;letter-spacing:.2em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Vivi &amp; Sam</div>
+    <div class="title">Galerie</div>
+    <div class="rule"></div>
+  </header>
+
+  <!-- LOGIN -->
+  <div class="login hidden" id="login">
+    <h2>Private Galerie</h2>
+    <input type="email" id="email" placeholder="E-Mail" autocomplete="username" inputmode="email">
+    <input type="password" id="pw" placeholder="Passwort" autocomplete="current-password">
+    <button class="btn" id="loginBtn">Einloggen</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <!-- ADMIN BAR -->
+  <div class="adminbar hidden" id="adminbar">
+    <button class="toggle off" id="toggleBtn">Für Gäste sichtbar: AUS</button>
+    <span class="meta" id="count">0 Dateien</span>
+    <button class="linkbtn" id="refreshBtn">Aktualisieren</button>
+    <button class="linkbtn" id="logoutBtn">Abmelden</button>
+  </div>
+  <div class="statusline off hidden" id="statusline"></div>
+
+  <!-- login hint for the couple when gallery is public -->
+  <div style="text-align:center"><span class="loginlink hidden" id="loginLink">Als Brautpaar einloggen</span></div>
+
+  <div class="msg hidden" id="msg"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="lb" id="lb"><span class="lb-close" id="lbClose">&times;</span></div>
+
+<footer>Vivi &amp; Sam · 08 · 10 · 2026</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script>
+var FIREBASE_CONFIG = {
+  apiKey:        "AIzaSyDnDWCFY8xAalQgiXBVbvpVxjrFpcpYIFE",
+  authDomain:    "vivi-sam.firebaseapp.com",
+  projectId:     "vivi-sam",
+  storageBucket: "vivi-sam.firebasestorage.app",
+  messagingSenderId: "908794118589",
+  appId:         "1:908794118589:web:649dce135ea65c0b6912d4"
+};
+(function(){
+  firebase.initializeApp(FIREBASE_CONFIG);
+  var auth=firebase.auth(), db=firebase.firestore(), storage=firebase.storage();
+
+  var $=function(id){return document.getElementById(id);};
+  var login=$('login'), adminbar=$('adminbar'), statusline=$('statusline'),
+      loginLink=$('loginLink'), msg=$('msg'), grid=$('grid'),
+      emailEl=$('email'), pwEl=$('pw'), loginBtn=$('loginBtn'), loginErr=$('loginErr'),
+      toggleBtn=$('toggleBtn'), countEl=$('count'), refreshBtn=$('refreshBtn'), logoutBtn=$('logoutBtn'),
+      lb=$('lb'), lbClose=$('lbClose');
+
+  var user=null, isPublic=false, started=false, timer=null, loginForced=false;
+  var known={};
+
+  function show(el){el.classList.remove('hidden');}
+  function hide(el){el.classList.add('hidden');}
+  function showMsg(t){msg.textContent=t;show(msg);}
+  function hideMsg(){hide(msg);}
+
+  // ---- auth + flag listeners ----
+  auth.onAuthStateChanged(function(u){ user=(u&&!u.isAnonymous)?u:null; apply(); });
+  db.collection('config').doc('gallery').onSnapshot(
+    function(d){ isPublic=d.exists&&d.data()&&d.data().public===true; updateToggle(); apply(); },
+    function(){ /* flag read error – ignore, stays private */ }
+  );
+
+  function updateToggle(){
+    toggleBtn.textContent = isPublic ? 'Für Gäste sichtbar: AN' : 'Für Gäste sichtbar: AUS';
+    toggleBtn.className = 'toggle ' + (isPublic ? 'on' : 'off');
+    statusline.textContent = isPublic ? 'Galerie ist für alle Gäste geöffnet' : 'Galerie ist privat (nur ihr)';
+    statusline.className = 'statusline ' + (isPublic ? '' : 'off');
+  }
+
+  function apply(){
+    if(user){
+      hide(login); show(adminbar); show(statusline); hide(loginLink);
+      startGallery();
+    } else if(isPublic){
+      (loginForced?show:hide)(login); hide(adminbar); hide(statusline); show(loginLink);
+      startGallery();
+    } else {
+      show(login); hide(adminbar); hide(statusline); hide(loginLink);
+      stopGallery(); clearGrid(); showMsg('Diese Galerie ist privat. Bitte einloggen.');
+    }
+  }
+
+  // ---- gallery ----
+  function clearGrid(){ grid.innerHTML=''; known={}; countEl.textContent='0 Dateien'; }
+  function startGallery(){ if(started)return; started=true; scan(); timer=setInterval(scan,20000); }
+  function stopGallery(){ started=false; if(timer){clearInterval(timer);timer=null;} }
+
+  function listRecursive(ref){
+    return ref.listAll().then(function(res){
+      var items=res.items.slice();
+      return res.prefixes.reduce(function(p,pref){
+        return p.then(function(acc){ return listRecursive(pref).then(function(sub){ return acc.concat(sub); }); });
+      }, Promise.resolve(items));
+    });
+  }
+
+  function scan(){
+    listRecursive(storage.ref('gaeste-uploads')).then(function(items){
+      var fresh=items.filter(function(it){ return !known[it.fullPath]; });
+      if(!fresh.length){ if(Object.keys(known).length===0) showMsg('Noch keine Uploads.'); else hideMsg(); return; }
+      return Promise.all(fresh.map(function(it){
+        return Promise.all([it.getDownloadURL(), it.getMetadata()]).then(function(r){ return {it:it,url:r[0],meta:r[1]}; });
+      })).then(function(data){
+        data.sort(function(a,b){ return new Date(a.meta.timeCreated)-new Date(b.meta.timeCreated); }); // oldest first
+        data.forEach(function(x){ known[x.it.fullPath]=1; grid.insertBefore(makeTile(x), grid.firstChild); });
+        hideMsg();
+        countEl.textContent=Object.keys(known).length+' Dateien';
+      });
+    }).catch(function(e){
+      if(user||isPublic) showMsg('Konnte Galerie nicht laden ('+((e&&e.code)||'?')+').');
+    });
+  }
+
+  function makeTile(x){
+    var ct=(x.meta.contentType||''), von=(x.meta.customMetadata&&x.meta.customMetadata.von)||'';
+    var tile=document.createElement('div'); tile.className='tile';
+    var media;
+    if(ct.indexOf('video/')===0){
+      tile.className='tile is-video';
+      media=document.createElement('video'); media.src=x.url+'#t=0.5'; media.preload='metadata'; media.muted=true; media.setAttribute('playsinline','');
+    } else {
+      media=document.createElement('img'); media.loading='lazy'; media.src=x.url; media.alt=von||'Foto';
+    }
+    tile.appendChild(media);
+    if(von){ var l=document.createElement('div'); l.className='von'; l.textContent=von; tile.appendChild(l); }
+    var dl=document.createElement('a'); dl.className='dl'; dl.href=x.url; dl.target='_blank'; dl.rel='noopener';
+    dl.setAttribute('download',''); dl.textContent='↓'; dl.title='Herunterladen';
+    dl.onclick=function(e){ e.stopPropagation(); };
+    tile.appendChild(dl);
+    tile.onclick=function(){ openLightbox(x); };
+    return tile;
+  }
+
+  function openLightbox(x){
+    var ct=(x.meta.contentType||''); var m;
+    var old=lb.querySelector('.lb-media'); if(old)lb.removeChild(old);
+    if(ct.indexOf('video/')===0){ m=document.createElement('video'); m.src=x.url; m.controls=true; m.autoplay=true; m.setAttribute('playsinline',''); }
+    else { m=document.createElement('img'); m.src=x.url; }
+    m.className='lb-media';
+    lb.appendChild(m); lb.classList.add('show');
+  }
+  function closeLightbox(){ lb.classList.remove('show'); var m=lb.querySelector('.lb-media'); if(m)lb.removeChild(m); }
+  lb.onclick=function(e){ if(e.target===lb||e.target===lbClose) closeLightbox(); };
+  lbClose.onclick=closeLightbox;
+
+  // ---- controls ----
+  loginBtn.onclick=function(){
+    loginErr.textContent='';
+    var email=(emailEl.value||'').trim(), pw=pwEl.value||'';
+    if(!email||!pw){ loginErr.textContent='Bitte E-Mail und Passwort eingeben.'; return; }
+    loginBtn.disabled=true;
+    auth.signInWithEmailAndPassword(email,pw).then(function(){ loginForced=false; pwEl.value=''; })
+      .catch(function(e){ loginErr.textContent='Anmeldung fehlgeschlagen ('+((e&&e.code)||'')+').'; })
+      .then(function(){ loginBtn.disabled=false; });
+  };
+  pwEl.addEventListener('keydown',function(e){ if(e.key==='Enter') loginBtn.click(); });
+  logoutBtn.onclick=function(){ auth.signOut(); };
+  loginLink.onclick=function(){ loginForced=true; apply(); emailEl.focus(); };
+  refreshBtn.onclick=function(){ scan(); };
+  toggleBtn.onclick=function(){
+    toggleBtn.disabled=true;
+    db.collection('config').doc('gallery').set({public:!isPublic},{merge:true})
+      .catch(function(e){ alert('Konnte den Schalter nicht ändern ('+((e&&e.code)||'?')+').'); })
+      .then(function(){ toggleBtn.disabled=false; });
+  };
+})();
+</script>
+</body>
+</html>

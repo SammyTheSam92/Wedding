@@ -1,32 +1,40 @@
 rules_version = '2';
 
-// Sicherheitsregeln für die Gäste-Uploads (Fotos & Videos).
+// Sicherheitsregeln für die Gäste-Uploads (Fotos & Videos) + Galerie-Lesezugriff.
 // In der Firebase Console unter  Storage → Regeln  einfügen und veröffentlichen.
 //
-// Prinzip:
-//  - Gäste melden sich anonym an (Anonymous Auth) und dürfen NUR schreiben.
-//  - Niemand kann die Dateien über die Website lesen oder auflisten
-//    (ihr seht sie in der Firebase Console / im verknüpften Cloud-Storage).
-//  - Nur Bilder und Videos, maximal 2 GB pro Datei.
+// - Gäste melden sich anonym an und dürfen nur SCHREIBEN (hochladen).
+// - LESEN/AUFLISTEN (für die Galerie) ist erlaubt für:
+//     * das Brautpaar (E-Mail/Passwort-Login), oder
+//     * alle, wenn der Galerie-Schalter offen ist
+//       (Firestore-Flagge config/gallery.public == true).
+// - Nur Bilder/Videos, max. 2 GB pro Datei.
+//
+// Hinweis: Weil hier firestore.get(...) genutzt wird, verlangt die Console beim
+// Veröffentlichen einmalig "Berechtigungen anhängen" (IAM-Rolle für den Storage-Dienst).
 
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Alles, was unter gaeste-uploads/ landet:
     match /gaeste-uploads/{allPaths=**} {
-      allow read, list: if false;              // keine öffentliche Ansicht
-      allow create: if request.auth != null    // anonym angemeldet
-                    && request.resource.size < 2 * 1024 * 1024 * 1024   // < 2 GB
-                    && (
-                         request.resource.contentType.matches('image/.*')
-                      || request.resource.contentType.matches('video/.*')
-                    );
-      allow update, delete: if false;          // nichts überschreiben/löschen
+      allow create: if request.auth != null
+                    && request.resource.size < 2 * 1024 * 1024 * 1024
+                    && (request.resource.contentType.matches('image/.*')
+                        || request.resource.contentType.matches('video/.*'));
+      allow read, list: if isAdmin() || galleryPublic();
+      allow update, delete: if false;
     }
 
-    // Alles andere ist gesperrt.
     match /{allPaths=**} {
       allow read, write: if false;
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+    function galleryPublic() {
+      return firestore.get(/databases/(default)/documents/config/gallery).data.public == true;
     }
   }
 }
