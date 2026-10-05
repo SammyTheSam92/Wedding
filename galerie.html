@@ -166,7 +166,7 @@ var FIREBASE_CONFIG = {
       gridTools=$('gridTools'), selectBtn=$('selectBtn'), selbar=$('selbar'), selCount=$('selCount'), selMsg=$('selMsg'), selDownload=$('selDownload'), selCancel=$('selCancel');
 
   var user=null, isPublic=false, started=false, timer=null, loginForced=false;
-  var known={}, itemsOrder=[], currentItem=null, selecting=false, selected={}, preparedFiles=null;
+  var known={}, itemsOrder=[], currentItem=null, selecting=false, selected={}, preparedFiles=null, prepMode=null, seqIndex=0;
 
   function show(el){el.classList.remove('hidden');}
   function hide(el){el.classList.add('hidden');}
@@ -317,7 +317,7 @@ var FIREBASE_CONFIG = {
   })();
 
   // ---- Mehrfach-Auswahl + Sichern ----
-  function resetPrepared(){ preparedFiles=null; selDownload.textContent='Sichern'; selMsg.textContent=''; }
+  function resetPrepared(){ preparedFiles=null; prepMode=null; seqIndex=0; selDownload.textContent='Sichern'; selMsg.textContent=''; }
   function updateSel(){ var n=Object.keys(selected).length; selCount.textContent=n+' ausgewählt'; if(preparedFiles)resetPrepared(); selDownload.disabled=n===0; }
   function toggleSel(x,tile){
     var k=x.it.fullPath;
@@ -334,23 +334,36 @@ var FIREBASE_CONFIG = {
   }
   selectBtn.onclick=function(){ if(selecting)exitSelect(); else enterSelect(); };
   selCancel.onclick=exitSelect;
+  function canShareFiles(fs){ return !!(navigator.canShare && navigator.canShare({files:fs})); }
   selDownload.onclick=function(){
-    // 2. Tipp: bereits vorbereitete Dateien teilen (frische Nutzer-Geste -> iOS erlaubt "In Fotos sichern")
+    // 2. Tipp: schon vorbereitete Dateien ins Teilen-Menü geben (frische Geste -> iOS "In Fotos sichern")
     if(preparedFiles){
-      navigator.share({files:preparedFiles}).then(function(){ exitSelect(); })
-        .catch(function(e){ if(e&&e.name==='AbortError'){ exitSelect(); return; } downloadAll(preparedFiles); exitSelect(); });
+      if(prepMode==='batch'){
+        navigator.share({files:preparedFiles}).then(function(){ exitSelect(); })
+          .catch(function(e){ if(e&&e.name==='AbortError'){ exitSelect(); return; } downloadAll(preparedFiles); exitSelect(); });
+      } else { // seq: eine Datei nach der anderen
+        var f=preparedFiles[seqIndex];
+        navigator.share({files:[f]}).then(function(){
+          seqIndex++;
+          if(seqIndex>=preparedFiles.length){ exitSelect(); }
+          else { selDownload.textContent='Weiter ('+(seqIndex+1)+'/'+preparedFiles.length+')'; }
+        }).catch(function(e){ if(e&&e.name!=='AbortError'){ selMsg.textContent='Teilen nicht möglich.'; } });
+      }
       return;
     }
-    // 1. Tipp: Dateien vorbereiten (herunterladen)
+    // 1. Tipp: Dateien vorbereiten (herunterladen), dann Modus wählen
     var items=[],k; for(k in selected)items.push(selected[k]);
     if(!items.length)return;
     selDownload.disabled=true; selMsg.textContent='Wird vorbereitet …';
     Promise.all(items.map(fetchAsFile)).then(function(files){
-      if(navigator.canShare&&navigator.canShare({files:files})){
-        preparedFiles=files; selDownload.disabled=false; selDownload.textContent='In Fotos sichern'; selMsg.textContent='';
-      } else {
-        downloadAll(files); exitSelect();
-      }
+      preparedFiles=files; seqIndex=0;
+      if(canShareFiles(files)){ prepMode='batch'; }            // Mehrfach-Teilen geht
+      else if(canShareFiles([files[0]])){ prepMode='seq'; }    // nur Einzel-Teilen (iPhone) -> nacheinander
+      else { prepMode='dl'; }                                  // kein Teilen (Desktop) -> Download
+      if(prepMode==='dl'){ downloadAll(files); exitSelect(); return; }
+      selDownload.disabled=false;
+      if(prepMode==='batch'){ selDownload.textContent='In Fotos sichern'; selMsg.textContent=''; }
+      else { selDownload.textContent='In Fotos sichern (1/'+files.length+')'; selMsg.textContent='Pro Datei einmal bestätigen'; }
     }).catch(function(){ selDownload.disabled=false; selMsg.textContent='Fehlgeschlagen (CORS?).'; });
   };
 
