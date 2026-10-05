@@ -166,7 +166,7 @@ var FIREBASE_CONFIG = {
       gridTools=$('gridTools'), selectBtn=$('selectBtn'), selbar=$('selbar'), selCount=$('selCount'), selMsg=$('selMsg'), selDownload=$('selDownload'), selCancel=$('selCancel');
 
   var user=null, isPublic=false, started=false, timer=null, loginForced=false;
-  var known={}, itemsOrder=[], currentItem=null, selecting=false, selected={};
+  var known={}, itemsOrder=[], currentItem=null, selecting=false, selected={}, preparedFiles=null;
 
   function show(el){el.classList.remove('hidden');}
   function hide(el){el.classList.add('hidden');}
@@ -247,7 +247,7 @@ var FIREBASE_CONFIG = {
     if(von){ var l=document.createElement('div'); l.className='von'; l.textContent=von; tile.appendChild(l); }
     var dl=document.createElement('a'); dl.className='dl'; dl.href=x.url; dl.target='_blank'; dl.rel='noopener';
     dl.textContent='↓'; dl.title='Herunterladen';
-    dl.onclick=function(e){ e.stopPropagation(); e.preventDefault(); saveFiles([x]); };
+    dl.onclick=function(e){ e.stopPropagation(); e.preventDefault(); saveOne(x); };
     tile.appendChild(dl);
     tile.onclick=function(){ if(selecting) toggleSel(x,tile); else openLightbox(x); };
     return tile;
@@ -279,34 +279,25 @@ var FIREBASE_CONFIG = {
     a.href=u; a.download=file.name; document.body.appendChild(a); a.click();
     setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); },1500);
   }
-  function saveFiles(items,opts){
-    opts=opts||{}; if(!items.length)return;
-    if(opts.onstart)opts.onstart();
-    Promise.all(items.map(function(x){
-      return fetch(x.url).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(blob){
-        return new File([blob],(x.it&&x.it.name)||'datei',{type:blob.type||x.meta.contentType||''});
-      });
-    })).then(function(files){
-      // iPhone/Android: nativer Teilen-Dialog -> "In Fotos sichern"
-      if(navigator.canShare&&navigator.canShare({files:files})){
-        return navigator.share({files:files}).then(function(){ if(opts.ondone)opts.ondone(); })
-          .catch(function(err){
-            if(err&&err.name==='AbortError'){ if(opts.ondone)opts.ondone(); return; }
-            files.forEach(function(f,i){ setTimeout(function(){triggerDownload(f);},i*300); }); if(opts.ondone)opts.ondone();
-          });
-      }
-      // Desktop: als einzelne Dateien speichern
-      files.forEach(function(f,i){ setTimeout(function(){triggerDownload(f);},i*300); });
-      if(opts.ondone)opts.ondone();
-    }).catch(function(){
-      if(opts.onerror)opts.onerror();
-      else if(items.length===1) window.open(items[0].url,'_blank','noopener');
+  function fetchAsFile(x){
+    return fetch(x.url).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(blob){
+      return new File([blob],(x.it&&x.it.name)||'datei',{type:blob.type||x.meta.contentType||''});
     });
+  }
+  function downloadAll(files){ files.forEach(function(f,i){ setTimeout(function(){triggerDownload(f);},i*400); }); }
+  // Einzel-Speichern: fetch -> Teilen (iPhone: "In Fotos sichern"), sonst Download.
+  function saveOne(x){
+    fetchAsFile(x).then(function(f){
+      if(navigator.canShare&&navigator.canShare({files:[f]})){
+        return navigator.share({files:[f]}).catch(function(e){ if(e&&e.name==='AbortError')return; triggerDownload(f); });
+      }
+      triggerDownload(f);
+    }).catch(function(){ window.open(x.url,'_blank','noopener'); });
   }
   lbClose.onclick=closeLightbox;
   lbPrev.onclick=function(e){ e.stopPropagation(); step(-1); };
   lbNext.onclick=function(e){ e.stopPropagation(); step(1); };
-  lbDl.onclick=function(e){ e.stopPropagation(); if(currentItem)saveFiles([currentItem]); };
+  lbDl.onclick=function(e){ e.stopPropagation(); if(currentItem)saveOne(currentItem); };
   lb.onclick=function(e){ if(e.target===lb||e.target===lbStage) closeLightbox(); };
   document.addEventListener('keydown',function(e){
     if(!lb.classList.contains('show'))return;
@@ -326,7 +317,8 @@ var FIREBASE_CONFIG = {
   })();
 
   // ---- Mehrfach-Auswahl + Sichern ----
-  function updateSel(){ var n=Object.keys(selected).length; selCount.textContent=n+' ausgewählt'; selDownload.disabled=n===0; }
+  function resetPrepared(){ preparedFiles=null; selDownload.textContent='Sichern'; selMsg.textContent=''; }
+  function updateSel(){ var n=Object.keys(selected).length; selCount.textContent=n+' ausgewählt'; if(preparedFiles)resetPrepared(); selDownload.disabled=n===0; }
   function toggleSel(x,tile){
     var k=x.it.fullPath;
     if(selected[k]){ delete selected[k]; tile.classList.remove('sel'); }
@@ -336,20 +328,30 @@ var FIREBASE_CONFIG = {
   function enterSelect(){ selecting=true; document.body.classList.add('selecting'); selectBtn.classList.add('active'); selectBtn.textContent='Fertig'; selbar.classList.add('show'); selMsg.textContent=''; updateSel(); }
   function exitSelect(){
     selecting=false; selected={}; document.body.classList.remove('selecting');
-    selectBtn.classList.remove('active'); selectBtn.textContent='Auswählen'; selbar.classList.remove('show'); selMsg.textContent='';
+    selectBtn.classList.remove('active'); selectBtn.textContent='Auswählen'; selbar.classList.remove('show');
+    selDownload.disabled=false; resetPrepared();
     var ts=document.querySelectorAll('.tile.sel'); for(var i=0;i<ts.length;i++)ts[i].classList.remove('sel');
   }
   selectBtn.onclick=function(){ if(selecting)exitSelect(); else enterSelect(); };
   selCancel.onclick=exitSelect;
   selDownload.onclick=function(){
+    // 2. Tipp: bereits vorbereitete Dateien teilen (frische Nutzer-Geste -> iOS erlaubt "In Fotos sichern")
+    if(preparedFiles){
+      navigator.share({files:preparedFiles}).then(function(){ exitSelect(); })
+        .catch(function(e){ if(e&&e.name==='AbortError'){ exitSelect(); return; } downloadAll(preparedFiles); exitSelect(); });
+      return;
+    }
+    // 1. Tipp: Dateien vorbereiten (herunterladen)
     var items=[],k; for(k in selected)items.push(selected[k]);
     if(!items.length)return;
-    selDownload.disabled=true;
-    saveFiles(items,{
-      onstart:function(){ selMsg.textContent='Wird vorbereitet …'; },
-      ondone:function(){ exitSelect(); },
-      onerror:function(){ selDownload.disabled=false; selMsg.textContent='Fehlgeschlagen (CORS?).'; }
-    });
+    selDownload.disabled=true; selMsg.textContent='Wird vorbereitet …';
+    Promise.all(items.map(fetchAsFile)).then(function(files){
+      if(navigator.canShare&&navigator.canShare({files:files})){
+        preparedFiles=files; selDownload.disabled=false; selDownload.textContent='In Fotos sichern'; selMsg.textContent='';
+      } else {
+        downloadAll(files); exitSelect();
+      }
+    }).catch(function(){ selDownload.disabled=false; selMsg.textContent='Fehlgeschlagen (CORS?).'; });
   };
 
   // ---- controls ----
