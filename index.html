@@ -917,7 +917,7 @@ var FIREBASE_CONFIG = {
   var configured=String(FIREBASE_CONFIG.apiKey).indexOf('PASTE_')!==0;
   var V='10.14.1', BASE='https://www.gstatic.com/firebasejs/'+V+'/';
   var SCRIPTS=['firebase-app-compat.js','firebase-auth-compat.js','firebase-storage-compat.js'];
-  var MAXB=2*1024*1024*1024;
+  var MAXB=5*1024*1024*1024;
 
   var input=document.getElementById('upInput'),
       drop=document.getElementById('upDrop'),
@@ -964,16 +964,36 @@ var FIREBASE_CONFIG = {
     else { msg.className='up-msg bad'; msg.textContent=t('fotos_somefailed')+(lastErr?' ('+lastErr+')':''); }
   }
 
+  // Manche Browser/Geräte (v.a. iOS mit HEIC/MOV) liefern file.type leer oder falsch.
+  // Dann würde die Datei mit leerem Content-Type hochgeladen und von den Regeln abgelehnt.
+  // Deshalb den Typ notfalls aus der Dateiendung erschließen.
+  var EXT_TYPE={
+    jpg:'image/jpeg',jpeg:'image/jpeg',jpe:'image/jpeg',jfif:'image/jpeg',
+    png:'image/png',gif:'image/gif',bmp:'image/bmp',webp:'image/webp',
+    tif:'image/tiff',tiff:'image/tiff',heic:'image/heic',heif:'image/heif',
+    avif:'image/avif',dng:'image/x-adobe-dng',
+    mov:'video/quicktime',qt:'video/quicktime',mp4:'video/mp4',m4v:'video/x-m4v',
+    '3gp':'video/3gpp','3g2':'video/3gpp2',avi:'video/x-msvideo',mkv:'video/x-matroska',
+    webm:'video/webm',mpeg:'video/mpeg',mpg:'video/mpeg',hevc:'video/mp4',ts:'video/mp2t'
+  };
+  function guessType(file){
+    var ct=(file&&file.type||'').toLowerCase();
+    if(/^image\//.test(ct)||/^video\//.test(ct)) return ct;
+    var m=(file&&file.name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+    var byExt=m&&EXT_TYPE[m[1]];
+    return byExt||ct||'';
+  }
   function upload(file){
     var el=addItem(file.name), bar=el.querySelector('.up-bar>span'), pct=el.querySelector('.up-pct');
-    var ok=/^image\//.test(file.type)||/^video\//.test(file.type);
+    var ct=guessType(file);
+    var ok=/^image\//.test(ct)||/^video\//.test(ct);
     if(!configured){ el.className='up-item err'; pct.textContent='–'; msg.className='up-msg bad'; msg.textContent=t('fotos_err_setup'); failCount++; tick(); return; }
-    if(!ok){ el.className='up-item err'; pct.textContent='✗'; lastErr='Typ'; failCount++; tick(); return; }
-    if(file.size>MAXB){ el.className='up-item err'; pct.textContent=t('fotos_toobig'); lastErr='>2GB'; failCount++; tick(); return; }
+    if(!ok){ el.className='up-item err'; pct.textContent='✗'; lastErr='Format'; failCount++; tick(); return; }
+    if(file.size>MAXB){ el.className='up-item err'; pct.textContent=t('fotos_toobig'); lastErr='>5GB'; failCount++; tick(); return; }
     var who=(nameEl&&nameEl.value.trim())||'';
     var path='gaeste-uploads/'+(who?safeName(who)+'/':'')+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'-'+safeName(file.name);
     try{
-      var task=firebase.storage().ref().child(path).put(file,{contentType:file.type,customMetadata:{von:who}});
+      var task=firebase.storage().ref().child(path).put(file,{contentType:ct,customMetadata:{von:who}});
       task.on('state_changed',
         function(s){ var p=s.totalBytes?Math.round(s.bytesTransferred/s.totalBytes*100):0; bar.style.width=p+'%'; pct.textContent=p+'%'; },
         function(err){ el.className='up-item err'; pct.textContent=t('fotos_failed'); lastErr=(err&&err.code)||'?'; try{console.error('upload failed',err);}catch(e){} failCount++; tick(); },

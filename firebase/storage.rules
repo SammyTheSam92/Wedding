@@ -8,7 +8,7 @@ rules_version = '2';
 //     * das Brautpaar (E-Mail/Passwort-Login), oder
 //     * alle, wenn der Galerie-Schalter offen ist
 //       (Firestore-Flagge config/gallery.public == true).
-// - Nur Bilder/Videos, max. 2 GB pro Datei.
+// - Nur Bilder/Videos, max. 5 GB pro Datei.
 //
 // Hinweis: Weil hier firestore.get(...) genutzt wird, verlangt die Console beim
 // Veröffentlichen einmalig "Berechtigungen anhängen" (IAM-Rolle für den Storage-Dienst).
@@ -18,7 +18,7 @@ service firebase.storage {
 
     match /gaeste-uploads/{allPaths=**} {
       allow create: if request.auth != null
-                    && request.resource.size < 2 * 1024 * 1024 * 1024
+                    && request.resource.size < 5 * 1024 * 1024 * 1024
                     && (request.resource.contentType.matches('image/.*')
                         || request.resource.contentType.matches('video/.*'));
       allow read, list: if isAdmin() || galleryPublic();
