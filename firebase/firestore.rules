@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// Sicherheitsregeln für Cloud Firestore.
+// In der Firebase Console unter  Firestore Database → Regeln  einfügen und veröffentlichen.
+//
+// Es gibt nur ein einziges Dokument: config/gallery mit dem Feld public (boolean).
+// Das ist der "Galerie für Gäste sichtbar"-Schalter.
+//  - Lesen: für alle erlaubt (die Galerie-Seite muss den Schalterstand kennen).
+//  - Schreiben (umschalten): nur das Brautpaar (E-Mail/Passwort-Login).
+// Alles andere ist gesperrt.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /config/gallery {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

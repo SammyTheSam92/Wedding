@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ECEBE6">
+<title>Galerie — Vivi &amp; Sam</title>
+<style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/CormorantGaramond-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Marcellus';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Marcellus-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Herr Von Muellerhoff';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/HerrVonMuellerhoff-400-normal.woff2') format('woff2')}
+:root{--cream:#ECEBE6;--cream-card:#F4F3EF;--ink:#0E0E10;--ink-soft:#39383b;--muted:#8a8780;--line:#cfccc3;--accent:#9a8c74;--on:#7f9068;--bad:#a4543f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased;padding:32px 18px 80px}
+.wrap{max-width:1100px;margin:0 auto}
+header{text-align:center;margin-bottom:28px}
+.eyebrow{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.4em;font-size:11px;color:var(--muted)}
+.title{font-family:'Herr Von Muellerhoff',cursive;font-size:clamp(54px,10vw,92px);line-height:1;color:var(--ink);margin-top:6px}
+.rule{width:44px;height:1px;background:var(--accent);margin:16px auto 0}
+.hidden{display:none!important}
+/* login */
+.login{max-width:360px;margin:30px auto;background:var(--cream-card);border:1px solid var(--line);padding:28px 24px;text-align:center}
+.login h2{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.18em;font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+.login input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--ink);font-family:'Cormorant Garamond',serif;font-size:18px;padding:10px 2px;outline:none;margin-bottom:16px;transition:border-color .3s}
+.login input:focus{border-color:var(--accent)}
+.btn{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.2em;font-size:12px;padding:13px 30px;cursor:pointer;background:var(--ink);color:var(--cream);border:1px solid var(--ink);transition:all .35s}
+.btn:hover{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:wait}
+.err{color:var(--bad);font-style:italic;font-size:15px;min-height:20px;margin-top:4px}
+.loginlink{display:inline-block;margin:10px auto 0;font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.16em;font-size:10.5px;color:var(--accent);cursor:pointer;border-bottom:1px solid transparent}
+.loginlink:hover{border-color:var(--accent)}
+/* admin bar */
+.adminbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;background:var(--cream-card);border:1px solid var(--line);padding:14px 18px;margin:0 auto 26px;max-width:720px}
+.toggle{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.16em;font-size:12px;padding:11px 22px;cursor:pointer;border-radius:100px;border:1px solid var(--line);transition:all .3s}
+.toggle.off{background:transparent;color:var(--muted)}
+.toggle.on{background:var(--on);color:#fff;border-color:var(--on)}
+.toggle:disabled{opacity:.5;cursor:wait}
+.meta{font-size:14px;color:var(--muted);font-family:'Marcellus',serif;letter-spacing:.06em}
+.linkbtn{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.14em;font-size:10.5px;color:var(--accent);cursor:pointer;background:none;border:none;border-bottom:1px solid transparent}
+.linkbtn:hover{border-color:var(--accent)}
+.statusline{text-align:center;font-family:'Marcellus',serif;letter-spacing:.1em;font-size:12px;text-transform:uppercase;color:var(--on);margin:-8px auto 22px}
+.statusline.off{color:var(--muted)}
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{position:relative;aspect-ratio:1;overflow:hidden;background:var(--cream-card);border:1px solid var(--line);cursor:pointer}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block}
+.tile.is-video::after{content:"\25B6";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:26px;text-shadow:0 2px 10px rgba(0,0,0,.5);pointer-events:none}
+.tile .von{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);color:#fff;font-size:12px;padding:16px 8px 6px;font-family:'Marcellus',serif;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .dl{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.85);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;opacity:0;transition:opacity .25s}
+.tile:hover .dl{opacity:1}
+.msg{text-align:center;color:var(--muted);font-style:italic;font-size:17px;margin:40px auto}
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(18,16,12,.94);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.lb.show{display:flex}
+.lb-stage{display:flex;align-items:center;justify-content:center;max-width:100%;max-height:100%}
+.lb-media{max-width:94vw;max-height:88vh;object-fit:contain;box-shadow:0 20px 70px rgba(0,0,0,.5)}
+.lb-top{position:fixed;top:12px;left:50%;transform:translateX(-50%);display:flex;gap:14px;z-index:3}
+.lb-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;opacity:.95;text-decoration:none;transition:background .2s}
+.lb-btn:hover{background:rgba(255,255,255,.28)}
+.lb-dl{font-size:20px}
+.lb-close{font-size:26px}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;border:none;cursor:pointer;font-size:30px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2;transition:background .2s,opacity .2s}
+.lb-nav:hover{background:rgba(255,255,255,.22)}
+.lb-prev{left:10px}.lb-next{right:10px}
+.lb-nav[disabled]{opacity:.22;cursor:default}
+@media(max-width:600px){.lb-nav{width:42px;height:42px;font-size:24px;background:rgba(255,255,255,.1)}}
+footer{text-align:center;margin-top:50px;font-size:13px;color:var(--muted);font-family:'Marcellus',serif;letter-spacing:.2em;text-transform:uppercase}
+.grid-tools{display:flex;justify-content:flex-end;margin:0 0 14px}
+.gtool{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--accent);background:none;border:1px solid var(--line);padding:9px 18px;border-radius:100px;cursor:pointer;transition:all .3s}
+.gtool.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tile .chk{position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--line);display:none;align-items:center;justify-content:center;font-size:14px;color:#fff;z-index:2}
+.selecting .tile .chk{display:flex}
+.tile.sel .chk{background:var(--accent);border-color:var(--accent)}
+.tile.sel .chk::after{content:"\2713"}
+.tile.sel{outline:3px solid var(--accent);outline-offset:-3px}
+.selecting .tile .dl{display:none}
+.selbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:none;align-items:center;gap:14px;background:var(--ink);color:var(--cream);padding:12px 20px;border-radius:100px;box-shadow:0 14px 44px rgba(0,0,0,.32);z-index:60;max-width:92vw}
+.selbar.show{display:flex}
+.selbar .scount{font-family:'Marcellus',serif;letter-spacing:.08em;font-size:13px;white-space:nowrap}
+.selbar .smsg{font-size:12.5px;color:#cbc7bd;font-style:italic}
+.selbar button{font-family:'Marcellus',serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px;cursor:pointer;border:none;background:none;white-space:nowrap}
+.selbar .sel-dl{background:var(--cream);color:var(--ink);padding:9px 18px;border-radius:100px}
+.selbar .sel-dl:disabled{opacity:.5;cursor:wait}
+.selbar .sel-cancel{color:#cbc7bd}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Vivi &amp; Sam</div>
+    <div class="title">Galerie</div>
+    <div class="rule"></div>
+  </header>
+
+  <!-- LOGIN -->
+  <div class="login hidden" id="login">
+    <h2>Private Galerie</h2>
+    <input type="email" id="email" placeholder="E-Mail" autocomplete="username" inputmode="email">
+    <input type="password" id="pw" placeholder="Passwort" autocomplete="current-password">
+    <button class="btn" id="loginBtn">Einloggen</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <!-- ADMIN BAR -->
+  <div class="adminbar hidden" id="adminbar">
+    <button class="toggle off" id="toggleBtn">Für Gäste sichtbar: AUS</button>
+    <span class="meta" id="count">0 Dateien</span>
+    <button class="linkbtn" id="refreshBtn">Aktualisieren</button>
+    <button class="linkbtn" id="logoutBtn">Abmelden</button>
+  </div>
+  <div class="statusline off hidden" id="statusline"></div>
+
+  <!-- login hint for the couple when gallery is public -->
+  <div style="text-align:center"><span class="loginlink hidden" id="loginLink">Als Brautpaar einloggen</span></div>
+
+  <div class="grid-tools hidden" id="gridTools">
+    <button class="gtool" id="selectBtn">Auswählen</button>
+  </div>
+  <div class="msg hidden" id="msg"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="selbar" id="selbar">
+  <span class="scount" id="selCount">0 ausgewählt</span>
+  <span class="smsg" id="selMsg"></span>
+  <button class="sel-dl" id="selDownload">Sichern</button>
+  <button class="sel-cancel" id="selCancel">Abbrechen</button>
+</div>
+
+<div class="lb" id="lb">
+  <div class="lb-top">
+    <button class="lb-btn lb-dl" id="lbDl" title="Herunterladen" aria-label="Herunterladen">&#8595;</button>
+    <button class="lb-btn lb-close" id="lbClose" title="Schließen" aria-label="Schließen">&times;</button>
+  </div>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Vorheriges">&#8249;</button>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="N&auml;chstes">&#8250;</button>
+  <div class="lb-stage" id="lbStage"></div>
+</div>
+
+<footer>Vivi &amp; Sam · 08 · 10 · 2026</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script>
+var FIREBASE_CONFIG = {
+  apiKey:        "AIzaSyDnDWCFY8xAalQgiXBVbvpVxjrFpcpYIFE",
+  authDomain:    "vivi-sam.firebaseapp.com",
+  projectId:     "vivi-sam",
+  storageBucket: "vivi-sam.firebasestorage.app",
+  messagingSenderId: "908794118589",
+  appId:         "1:908794118589:web:649dce135ea65c0b6912d4"
+};
+(function(){
+  firebase.initializeApp(FIREBASE_CONFIG);
+  var auth=firebase.auth(), db=firebase.firestore(), storage=firebase.storage();
+
+  var $=function(id){return document.getElementById(id);};
+  var login=$('login'), adminbar=$('adminbar'), statusline=$('statusline'),
+      loginLink=$('loginLink'), msg=$('msg'), grid=$('grid'),
+      emailEl=$('email'), pwEl=$('pw'), loginBtn=$('loginBtn'), loginErr=$('loginErr'),
+      toggleBtn=$('toggleBtn'), countEl=$('count'), refreshBtn=$('refreshBtn'), logoutBtn=$('logoutBtn'),
+      lb=$('lb'), lbClose=$('lbClose'), lbStage=$('lbStage'), lbPrev=$('lbPrev'), lbNext=$('lbNext'), lbDl=$('lbDl'),
+      gridTools=$('gridTools'), selectBtn=$('selectBtn'), selbar=$('selbar'), selCount=$('selCount'), selMsg=$('selMsg'), selDownload=$('selDownload'), selCancel=$('selCancel');
+
+  var user=null, isPublic=false, started=false, timer=null, loginForced=false;
+  var known={}, itemsOrder=[], currentItem=null, selecting=false, selected={}, preparedFiles=null, prepMode=null, seqIndex=0;
+
+  function show(el){el.classList.remove('hidden');}
+  function hide(el){el.classList.add('hidden');}
+  function showMsg(t){msg.textContent=t;show(msg);}
+  function hideMsg(){hide(msg);}
+
+  // ---- auth + flag listeners ----
+  auth.onAuthStateChanged(function(u){ user=(u&&!u.isAnonymous)?u:null; apply(); });
+  db.collection('config').doc('gallery').onSnapshot(
+    function(d){ isPublic=d.exists&&d.data()&&d.data().public===true; updateToggle(); apply(); },
+    function(){ /* flag read error – ignore, stays private */ }
+  );
+
+  function updateToggle(){
+    toggleBtn.textContent = isPublic ? 'Für Gäste sichtbar: AN' : 'Für Gäste sichtbar: AUS';
+    toggleBtn.className = 'toggle ' + (isPublic ? 'on' : 'off');
+    statusline.textContent = isPublic ? 'Galerie ist für alle Gäste geöffnet' : 'Galerie ist privat (nur ihr)';
+    statusline.className = 'statusline ' + (isPublic ? '' : 'off');
+  }
+
+  function apply(){
+    if(user){
+      hide(login); show(adminbar); show(statusline); hide(loginLink);
+      startGallery();
+    } else if(isPublic){
+      (loginForced?show:hide)(login); hide(adminbar); hide(statusline); show(loginLink);
+      startGallery();
+    } else {
+      show(login); hide(adminbar); hide(statusline); hide(loginLink);
+      stopGallery(); clearGrid(); showMsg('Diese Galerie ist privat. Bitte einloggen.');
+    }
+  }
+
+  // ---- gallery ----
+  function clearGrid(){ grid.innerHTML=''; known={}; itemsOrder=[]; countEl.textContent='0 Dateien'; if(gridTools)gridTools.classList.add('hidden'); if(selecting)exitSelect(); }
+  function startGallery(){ if(started)return; started=true; scan(); timer=setInterval(scan,20000); }
+  function stopGallery(){ started=false; if(timer){clearInterval(timer);timer=null;} }
+
+  function listRecursive(ref){
+    return ref.listAll().then(function(res){
+      var items=res.items.slice();
+      return res.prefixes.reduce(function(p,pref){
+        return p.then(function(acc){ return listRecursive(pref).then(function(sub){ return acc.concat(sub); }); });
+      }, Promise.resolve(items));
+    });
+  }
+
+  function scan(){
+    listRecursive(storage.ref('gaeste-uploads')).then(function(items){
+      var fresh=items.filter(function(it){ return !known[it.fullPath]; });
+      if(!fresh.length){ if(Object.keys(known).length===0) showMsg('Noch keine Uploads.'); else hideMsg(); return; }
+      return Promise.all(fresh.map(function(it){
+        return Promise.all([it.getDownloadURL(), it.getMetadata()]).then(function(r){ return {it:it,url:r[0],meta:r[1]}; });
+      })).then(function(data){
+        data.sort(function(a,b){ return new Date(a.meta.timeCreated)-new Date(b.meta.timeCreated); }); // oldest first
+        data.forEach(function(x){ known[x.it.fullPath]=1; itemsOrder.unshift(x); grid.insertBefore(makeTile(x), grid.firstChild); });
+        hideMsg();
+        countEl.textContent=Object.keys(known).length+' Dateien';
+        gridTools.classList.toggle('hidden', Object.keys(known).length===0);
+      });
+    }).catch(function(e){
+      if(user||isPublic) showMsg('Konnte Galerie nicht laden ('+((e&&e.code)||'?')+').');
+    });
+  }
+
+  function makeTile(x){
+    var ct=(x.meta.contentType||''), von=(x.meta.customMetadata&&x.meta.customMetadata.von)||'';
+    var tile=document.createElement('div'); tile.className='tile';
+    var media;
+    if(ct.indexOf('video/')===0){
+      tile.className='tile is-video';
+      media=document.createElement('video'); media.src=x.url+'#t=0.5'; media.preload='metadata'; media.muted=true; media.setAttribute('playsinline','');
+    } else {
+      media=document.createElement('img'); media.loading='lazy'; media.src=x.url; media.alt=von||'Foto';
+    }
+    tile.appendChild(media);
+    var chk=document.createElement('div'); chk.className='chk'; tile.appendChild(chk);
+    if(von){ var l=document.createElement('div'); l.className='von'; l.textContent=von; tile.appendChild(l); }
+    var dl=document.createElement('a'); dl.className='dl'; dl.href=x.url; dl.target='_blank'; dl.rel='noopener';
+    dl.textContent='↓'; dl.title='Herunterladen';
+    dl.onclick=function(e){ e.stopPropagation(); e.preventDefault(); saveOne(x); };
+    tile.appendChild(dl);
+    tile.onclick=function(){ if(selecting) toggleSel(x,tile); else openLightbox(x); };
+    return tile;
+  }
+
+  function isVideo(x){ return x && (x.meta.contentType||'').indexOf('video/')===0; }
+  function renderLB(){
+    if(!currentItem)return;
+    var x=currentItem, m;
+    lbStage.innerHTML='';
+    if(isVideo(x)){ m=document.createElement('video'); m.src=x.url; m.controls=true; m.autoplay=true; m.setAttribute('playsinline',''); }
+    else { m=document.createElement('img'); m.src=x.url; m.alt=''; }
+    m.className='lb-media';
+    lbStage.appendChild(m);
+    var idx=itemsOrder.indexOf(x);
+    lbPrev.disabled = idx<=0;
+    lbNext.disabled = idx<0 || idx>=itemsOrder.length-1;
+  }
+  function openLightbox(x){ currentItem=x; renderLB(); lb.classList.add('show'); }
+  function closeLightbox(){ lb.classList.remove('show'); lbStage.innerHTML=''; currentItem=null; }
+  function step(dir){
+    if(!currentItem)return;
+    var idx=itemsOrder.indexOf(currentItem); if(idx<0)return;
+    var ni=idx+dir; if(ni<0||ni>=itemsOrder.length)return;
+    currentItem=itemsOrder[ni]; renderLB();
+  }
+  function triggerDownload(file){
+    var u=URL.createObjectURL(file), a=document.createElement('a');
+    a.href=u; a.download=file.name; document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); },1500);
+  }
+  function fetchAsFile(x){
+    return fetch(x.url).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(blob){
+      return new File([blob],(x.it&&x.it.name)||'datei',{type:blob.type||x.meta.contentType||''});
+    });
+  }
+  function downloadAll(files){ files.forEach(function(f,i){ setTimeout(function(){triggerDownload(f);},i*400); }); }
+  // Einzel-Speichern: fetch -> Teilen (iPhone: "In Fotos sichern"), sonst Download.
+  function saveOne(x){
+    fetchAsFile(x).then(function(f){
+      if(navigator.canShare&&navigator.canShare({files:[f]})){
+        return navigator.share({files:[f]}).catch(function(e){ if(e&&e.name==='AbortError')return; triggerDownload(f); });
+      }
+      triggerDownload(f);
+    }).catch(function(){ window.open(x.url,'_blank','noopener'); });
+  }
+  lbClose.onclick=closeLightbox;
+  lbPrev.onclick=function(e){ e.stopPropagation(); step(-1); };
+  lbNext.onclick=function(e){ e.stopPropagation(); step(1); };
+  lbDl.onclick=function(e){ e.stopPropagation(); if(currentItem)saveOne(currentItem); };
+  lb.onclick=function(e){ if(e.target===lb||e.target===lbStage) closeLightbox(); };
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('show'))return;
+    if(e.key==='Escape')closeLightbox();
+    else if(e.key==='ArrowLeft')step(-1);
+    else if(e.key==='ArrowRight')step(1);
+  });
+  (function(){
+    var x0=null,y0=null;
+    lb.addEventListener('touchstart',function(e){ if(e.touches.length!==1){x0=null;return;} x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
+    lb.addEventListener('touchend',function(e){
+      if(x0===null)return; if(isVideo(currentItem)){x0=null;return;}
+      var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+      if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3){ step(dx<0?1:-1); }
+      x0=null;y0=null;
+    },{passive:true});
+  })();
+
+  // ---- Mehrfach-Auswahl + Sichern ----
+  function resetPrepared(){ preparedFiles=null; prepMode=null; seqIndex=0; selDownload.textContent='Sichern'; selMsg.textContent=''; }
+  function updateSel(){ var n=Object.keys(selected).length; selCount.textContent=n+' ausgewählt'; if(preparedFiles)resetPrepared(); selDownload.disabled=n===0; }
+  function toggleSel(x,tile){
+    var k=x.it.fullPath;
+    if(selected[k]){ delete selected[k]; tile.classList.remove('sel'); }
+    else { selected[k]=x; tile.classList.add('sel'); }
+    updateSel();
+  }
+  function enterSelect(){ selecting=true; document.body.classList.add('selecting'); selectBtn.classList.add('active'); selectBtn.textContent='Fertig'; selbar.classList.add('show'); selMsg.textContent=''; updateSel(); }
+  function exitSelect(){
+    selecting=false; selected={}; document.body.classList.remove('selecting');
+    selectBtn.classList.remove('active'); selectBtn.textContent='Auswählen'; selbar.classList.remove('show');
+    selDownload.disabled=false; resetPrepared();
+    var ts=document.querySelectorAll('.tile.sel'); for(var i=0;i<ts.length;i++)ts[i].classList.remove('sel');
+  }
+  selectBtn.onclick=function(){ if(selecting)exitSelect(); else enterSelect(); };
+  selCancel.onclick=exitSelect;
+  function canShareFiles(fs){ return !!(navigator.canShare && navigator.canShare({files:fs})); }
+  selDownload.onclick=function(){
+    // 2. Tipp: schon vorbereitete Dateien ins Teilen-Menü geben (frische Geste -> iOS "In Fotos sichern")
+    if(preparedFiles){
+      if(prepMode==='batch'){
+        navigator.share({files:preparedFiles}).then(function(){ exitSelect(); })
+          .catch(function(e){ if(e&&e.name==='AbortError'){ exitSelect(); return; } downloadAll(preparedFiles); exitSelect(); });
+      } else { // seq: eine Datei nach der anderen
+        var f=preparedFiles[seqIndex];
+        navigator.share({files:[f]}).then(function(){
+          seqIndex++;
+          if(seqIndex>=preparedFiles.length){ exitSelect(); }
+          else { selDownload.textContent='Weiter ('+(seqIndex+1)+'/'+preparedFiles.length+')'; }
+        }).catch(function(e){ if(e&&e.name!=='AbortError'){ selMsg.textContent='Teilen nicht möglich.'; } });
+      }
+      return;
+    }
+    // 1. Tipp: Dateien vorbereiten (herunterladen), dann Modus wählen
+    var items=[],k; for(k in selected)items.push(selected[k]);
+    if(!items.length)return;
+    selDownload.disabled=true; selMsg.textContent='Wird vorbereitet …';
+    Promise.all(items.map(fetchAsFile)).then(function(files){
+      preparedFiles=files; seqIndex=0;
+      if(canShareFiles(files)){ prepMode='batch'; }            // Mehrfach-Teilen geht
+      else if(canShareFiles([files[0]])){ prepMode='seq'; }    // nur Einzel-Teilen (iPhone) -> nacheinander
+      else { prepMode='dl'; }                                  // kein Teilen (Desktop) -> Download
+      if(prepMode==='dl'){ downloadAll(files); exitSelect(); return; }
+      selDownload.disabled=false;
+      if(prepMode==='batch'){ selDownload.textContent='In Fotos sichern'; selMsg.textContent=''; }
+      else { selDownload.textContent='In Fotos sichern (1/'+files.length+')'; selMsg.textContent='Pro Datei einmal bestätigen'; }
+    }).catch(function(){ selDownload.disabled=false; selMsg.textContent='Fehlgeschlagen (CORS?).'; });
+  };
+
+  // ---- controls ----
+  loginBtn.onclick=function(){
+    loginErr.textContent='';
+    var email=(emailEl.value||'').trim(), pw=pwEl.value||'';
+    if(!email||!pw){ loginErr.textContent='Bitte E-Mail und Passwort eingeben.'; return; }
+    loginBtn.disabled=true;
+    auth.signInWithEmailAndPassword(email,pw).then(function(){ loginForced=false; pwEl.value=''; })
+      .catch(function(e){ loginErr.textContent='Anmeldung fehlgeschlagen ('+((e&&e.code)||'')+').'; })
+      .then(function(){ loginBtn.disabled=false; });
+  };
+  pwEl.addEventListener('keydown',function(e){ if(e.key==='Enter') loginBtn.click(); });
+  logoutBtn.onclick=function(){ auth.signOut(); };
+  loginLink.onclick=function(){ loginForced=true; apply(); emailEl.focus(); };
+  refreshBtn.onclick=function(){ scan(); };
+  toggleBtn.onclick=function(){
+    toggleBtn.disabled=true;
+    db.collection('config').doc('gallery').set({public:!isPublic},{merge:true})
+      .catch(function(e){ alert('Konnte den Schalter nicht ändern ('+((e&&e.code)||'?')+').'); })
+      .then(function(){ toggleBtn.disabled=false; });
+  };
+})();
+</script>
+</body>
+</html>
